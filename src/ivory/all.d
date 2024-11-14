@@ -4,8 +4,9 @@ public:
 
 import std.stdio        : writefln, writef;
 import std.format       : format;
-import std.algorithm    : find, any, sort;
+import std.algorithm    : any, find, map, filter, sort;
 import std.math         : abs;
+import std.range        : array, iota;
 
 import common           : as, frontOrElse, Ansi, ansiWrap, throwIf, throwIfNot;
 
@@ -45,4 +46,25 @@ T maxOf(T)(T a, T b) {
 }
 T minOf(T)(T a, T b) {
     return a < b ? a : b;
+}
+
+version(LDC) {
+    import ldc.llvmasm;
+    import ldc.attributes;
+    // https://wiki.dlang.org/LDC_inline_assembly_expressions
+    // https://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html
+
+    uint rol(uint a, uint b) nothrow @nogc {
+        return __asm!uint(`
+            roll %cl, $0
+        `, 
+        "={eax},{eax},{ecx}",a,b);
+    }
+    uint ror(uint a, uint b) nothrow @nogc {
+        return __asm!uint(`
+            rorl %cl, $0
+        `, 
+        "={eax},{eax},{ecx}",
+        a, b);
+    }
 }

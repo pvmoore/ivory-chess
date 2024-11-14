@@ -4,11 +4,11 @@ platforms "windows"
 buildType "debug" {
     dflags "-color" platform="dmd"
 
-	buildOptions "debugMode" "debugInfo" "alwaysStackFrame" "stackStomping" "warningsAsErrors"
+	buildOptions "debugMode" "debugInfo" "stackStomping" "warningsAsErrors" #"alwaysStackFrame" #"stackStomping" 
 }
 buildType "release" {
     dflags "-O5"                            platform="ldc"
-    dflags "-mcpu=haswell"                  platform="ldc"
+    dflags "-mcpu=znver3"                  platform="ldc"
     dflags "-mattr=+fma,+avx2"              platform="ldc"
     #dflags "-expensive-combines"            platform="ldc"
     #dflags "-enable-cross-module-inlining"  platform="ldc"

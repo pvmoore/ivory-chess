@@ -24,6 +24,17 @@ alias byteboard = ubyte[64];
 enum PIECE_MASK = 0b0111;
 enum SIDE_MASK  = 0b1000;
 
+Piece pieceAt(ref byteboard bb, square sq) {
+    return (bb[sq] & PIECE_MASK).as!Piece;
+}
+Side sideAt(ref byteboard bb, square sq) {
+    return (bb[sq] >>> 3).as!Side;
+}
+void set(ref byteboard bb, square sq, Piece p, Side s) {
+    bb[sq] = (p | (s<<3)).as!ubyte;
+}
+
+
 uint file(square sq) { return sq & 7; }
 uint rank(square sq) { return sq >>> 3; }
 
@@ -38,8 +49,24 @@ string algebraic(square sq) {
  * Todo - describe bit positions -> file and rank
  */
 alias bitboard = ulong;
+   
+alias nibbleboard = uint[8];
 
-/** 
- * Todo - is this better as ulong[4] or ubyte[32] ?
- */
-alias nibbleboard = ulong[4];
+Piece pieceAt(ref nibbleboard bb, square sq) {
+    auto a = sq >>> 3;
+    auto b = (sq & 7) << 2; 
+    return ((bb[a] >>> b) & PIECE_MASK).as!Piece;
+}
+Side sideAt(ref nibbleboard bb, square sq) {
+    auto a = sq >>> 3;
+    auto b = ((sq & 7) << 2) + 3; 
+    return ((bb[a] >>> b) & 1).as!Side;
+}
+void set(ref nibbleboard bb, square sq, Piece p, Side s) {
+    uint a = sq >>> 3;
+    uint b = (sq & 7) << 2;
+    bb[a] &= ~(15 << b);
+    bb[a] |= ((p | (s<<3)) << b);
+}
+
+

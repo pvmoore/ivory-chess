@@ -5,7 +5,7 @@ import std.string 	: split, indexOf;
 import core.memory  : GC;
 
 import ivory.all;
-import test_perft;
+import test;
 
 final class Ivory {
 public:
@@ -84,6 +84,9 @@ private:
             // ###############################################################################
             case "perft": 
                 testPerft();
+                break;
+            case "boards":
+                testBoards();
                 break;
             case "q":
                 displayGCStats();
