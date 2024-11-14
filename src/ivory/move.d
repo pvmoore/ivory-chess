@@ -76,7 +76,6 @@ public:
     bool isCastle() { return flag() == Flag.CASTLE; }
     bool isEnPassantCapture() { return flag() == Flag.ENPASSANT_CAPTURE; }
     bool isPawnMove() { return flag() == Flag.PAWN_MOVE || flag() == Flag.ENPASSANT_CAPTURE; }
-    bool isCaptureOrPawnMove() { return isCapture() || isPawnMove(); }
     bool isPromotion() {
         Flag f = flag();
         return f==Flag.PROMOTE_BISHOP ||

@@ -5,12 +5,12 @@ import ivory.all;
 final class MailboxPosition {
 public:
     struct State {
+        byteboard board;
         uint halfMoveClock;
         uint fullMoveNumber;
         uint castlingPermissions;
         square enPassantTargetSquare;
         Side sideToMove;
-        byteboard board;
         // Optimisation
         square whiteKingSquare;
         square blackKingSquare;

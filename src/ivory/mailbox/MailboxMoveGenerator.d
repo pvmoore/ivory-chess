@@ -27,17 +27,17 @@ public:
     this() {
         this.moves = new MoveList();
     }
-    /** Generate moves for position and return the number of moves */
+    /** Generate moves for position and return the number of moves generated */
     uint generate(MailboxPosition pos) {
         this.pos = pos;
         this.side = pos.state.sideToMove;
         this.enemy = side.opposite();
-        this.isWhite = side == Side.WHITE;
         this.numMoves = 0;
 
         foreach(i; 0..64.as!square) {
+            if(pos.isEmpty(i)) continue;
             Piece sqPiece = pos.pieceAt(i);
-            if(sqPiece != Piece.NONE && pos.sideAt(i) == side) {
+            if(pos.sideAt(i) == side) {
                 generateForSquare(i, sqPiece);
             }
         }
@@ -51,14 +51,13 @@ private:
     MailboxPosition pos;
     Side side;
     Side enemy;
-    bool isWhite;
     uint numMoves;
     
     void addMove(Move m, bool checkKing = true) {
-        // Don't add this move if the king is attacked
 
         bool kingIsAttacked = false;
 
+        // Don't add this move if the king is attacked
         if(checkKing) {
             byteboard tempBoard = pos.state.board[];
 
@@ -70,7 +69,7 @@ private:
             makeMoveOnBoardOnly(tempBoard, m, side);
             kingIsAttacked = squareIsAttacked(tempBoard, kingSquare, side.opposite());
 
-            // This is slower:
+            // Note: This method is slower:
             // pos.makeMove(m);
             // kingIsAttacked = pos.isSquareAttacked(pos.kingSquare(side), side.opposite());
             // pos.unmakeMove();
@@ -98,7 +97,7 @@ private:
             case NONE: assert(false, "Piece should not be NONE"); break;
             case PAWN:  generatePawnMoves(sq, file, rank); break;
             case BISHOP: generateBishopMoves(sq, file, rank); break;
-            case KNIGHT: generateKnightMoves(sq, file, rank); break;
+            case KNIGHT: generateKnightMoves(sq); break;
             case ROOK: generateRookMoves(sq, file, rank); break;
             case QUEEN:
                 generateRookMoves(sq, file, rank);
@@ -117,7 +116,7 @@ private:
         int PROMOTE_FROM_RANK;
         int ENPASSANT_FROM_RANK;
 
-        if(isWhite) {
+        if(side == Side.WHITE) {
             UP = 8;
             UP2 = 16;
             UP_LEFT = 7;
@@ -186,54 +185,12 @@ private:
             }
         }
     }
-    void generateKnightMoves(square sq, int file, int rank) {
-
-        void _addMove(square target) {
+    void generateKnightMoves(square sq) {
+        foreach(target; knightMoves(sq)) {
             if(pos.isEmpty(target)) {
                 addMove(Move(sq, target));
             } else if(pos.sideAt(target) == enemy) {
                 addCapture(sq, target);
-            }
-        }
-
-        if(rank < 6) {
-            // up up left
-            if(file > 0) {
-                _addMove(sq + 15);
-            }
-            // up up right
-            if(file < 7) {
-                _addMove(sq + 17);
-            }
-        }    
-        if(file < 6) {
-            // right right up
-            if(rank < 7) {
-                _addMove(sq + 10);
-            }
-            // right right down
-            if(rank > 0) {
-                _addMove(sq - 6);
-            }
-        }
-        if(rank > 1) {
-            // down down right
-            if(file < 7) {
-                _addMove(sq - 15);
-            }
-            // down down left
-            if(file > 0) {
-                _addMove(sq - 17);
-            }
-        }
-        if(file > 1) {
-            // left left down
-            if(rank > 0) {
-                _addMove(sq - 10);
-            }
-            // left left up
-            if(rank < 7) {
-                _addMove(sq + 6);
             }
         }
     }
@@ -352,6 +309,12 @@ private:
             // of the current king position. This is likely to be quicker than applying the move and then checking
             if(!inCheck) {
                 if(squareIsAttacked(pos.state.board, target, enemy)) return;
+            } else {
+                // Remove the king and check the target square. This is slower for some reason.
+                // pos.setEmpty(sq);
+                // bool stillInCheck = squareIsAttacked(pos.state.board, target, enemy);
+                // pos.set(sq, Piece.KING, side); 
+                // if(stillInCheck) return;
             }
 
             auto flag2 = pos.isOccupied(target) ? Move.Flag2.CAPTURE : Move.Flag2.NONE;
@@ -392,10 +355,11 @@ private:
         }
 
         // Castling 
+        if(inCheck) return;
+
         if(pos.canCastleKingSide()) {
             if(pos.isEmpty(sq + 1) && pos.isEmpty(sq + 2)) {
-                if(!inCheck &&
-                   !pos.isSquareAttacked(sq + 1, enemy) &&
+                if(!pos.isSquareAttacked(sq + 1, enemy) &&
                    !pos.isSquareAttacked(sq + 2, enemy))
                 {
                     addMove(Move(sq, sq + 2, Move.Flag.CASTLE, Move.Flag2.NONE), false);
@@ -404,8 +368,7 @@ private:
         }
         if(pos.canCastleQueenSide()) {
             if(pos.isEmpty(sq - 1) && pos.isEmpty(sq - 2) && pos.isEmpty(sq - 3)) {
-                if(!inCheck &&
-                   !pos.isSquareAttacked(sq - 1, enemy) &&
+                if(!pos.isSquareAttacked(sq - 1, enemy) &&
                    !pos.isSquareAttacked(sq - 2, enemy))
                 {
                     addMove(Move(sq, sq - 2, Move.Flag.CASTLE, Move.Flag2.NONE), false);

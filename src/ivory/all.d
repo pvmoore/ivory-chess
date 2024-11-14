@@ -2,27 +2,24 @@ module ivory.all;
 
 public:
 
-import std.stdio        : writefln;
+import std.stdio        : writefln, writef;
 import std.format       : format;
-import std.algorithm    : find, any;
+import std.algorithm    : find, any, sort;
 import std.math         : abs;
 
-import common : as, frontOrElse, Ansi, ansiWrap, throwIf, throwIfNot;
+import common           : as, frontOrElse, Ansi, ansiWrap, throwIf, throwIfNot;
 
 import ivory.board;
 import ivory.Castling;
 import ivory.FEN;
 import ivory.Game;
+import ivory.Ivory;
 import ivory.Move;
 import ivory.MoveList;
 import ivory.Piece;
 import ivory.Side;
 
-import ivory.mailbox.MailboxAttacks;
-import ivory.mailbox.MailboxEnprise;
-import ivory.mailbox.MailboxMakeMove;
-import ivory.mailbox.MailboxPosition;
-import ivory.mailbox.MailboxMoveGenerator;
+import ivory.mailbox;
 
 enum MAX_MOVES = 1024;
 enum MAX_PLY   = 32;

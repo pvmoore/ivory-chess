@@ -17,7 +17,8 @@ bool squareIsAttacked(ref byteboard bb, square sq, Side bySide) {
            isSquareAttackedOnFileOrRank(bb, sq, rank, file, bySide);
 }
 
-private:
+//──────────────────────────────────────────────────────────────────────────────────────────────────
+//private:
 
 bool isSquareAttackedByPawn(ref byteboard bb, square sq, int rank, int file, Side bySide) {
     if(bySide == Side.WHITE) {
@@ -40,21 +41,29 @@ bool isSquareAttackedByPawn(ref byteboard bb, square sq, int rank, int file, Sid
 bool isSquareAttackedByKnight(ref byteboard bb, square sq, int rank, int file, Side bySide) {
     uint knight = Piece.KNIGHT | (bySide<<3);
 
-    if(rank < 6) {
-        if(file > 0 && bb[sq + 15] == knight) return true;
-        if(file < 7 && bb[sq + 17] == knight) return true;
-    }
-    if(rank > 1) {
-        if(file > 0 && bb[sq - 17] == knight) return true;
-        if(file < 7 && bb[sq - 15] == knight) return true;
-    }
-    if(file < 6) {
-        if(rank < 7 && bb[sq + 10] == knight) return true;
-        if(rank > 0 && bb[sq - 6]  == knight) return true;
-    }
-    if(file > 1) {
-        if(rank < 7 && bb[sq + 6]  == knight) return true;
-        if(rank > 0 && bb[sq - 10] == knight) return true;
+    // Note: The lookup method seems to be slightly slower
+    enum LOOKUP = false;
+    static if(LOOKUP) {
+        foreach(target; knightMoves(sq)) {
+            if(bb[target] == knight) return true;
+        }
+    } else {
+        if(rank < 6) {
+            if(file > 0 && bb[sq + 15] == knight) return true;
+            if(file < 7 && bb[sq + 17] == knight) return true;
+        }
+        if(rank > 1) {
+            if(file > 0 && bb[sq - 17] == knight) return true;
+            if(file < 7 && bb[sq - 15] == knight) return true;
+        }
+        if(file < 6) {
+            if(rank < 7 && bb[sq + 10] == knight) return true;
+            if(rank > 0 && bb[sq - 6]  == knight) return true;
+        }
+        if(file > 1) {
+            if(rank < 7 && bb[sq + 6]  == knight) return true;
+            if(rank > 0 && bb[sq - 10] == knight) return true;
+        }
     }
     return false;
 }

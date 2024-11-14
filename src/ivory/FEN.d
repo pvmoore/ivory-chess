@@ -7,9 +7,6 @@ import ivory.all;
  *
  * Chess start position:
  *      rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 
- *
- * Position with en-passant square:
- * nbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2
  */
 final class FEN {
 public:
@@ -36,7 +33,7 @@ public:
         this.fenString = generateFenString();
     }
 
-    bool opEquals(FEN other) const {
+    bool opEquals(FEN other) {
         return sideToMove == other.sideToMove &&
                castlingPermissions == other.castlingPermissions &&
                enPassantTargetSquare == other.enPassantTargetSquare &&
