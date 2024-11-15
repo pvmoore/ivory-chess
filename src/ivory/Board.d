@@ -30,10 +30,19 @@ Piece pieceAt(ref byteboard bb, square sq) {
 Side sideAt(ref byteboard bb, square sq) {
     return (bb[sq] >>> 3).as!Side;
 }
+uint get(ref byteboard bb, square sq) {
+    return bb[sq];
+}
 void set(ref byteboard bb, square sq, Piece p, Side s) {
     bb[sq] = (p | (s<<3)).as!ubyte;
 }
-
+void setEmpty(ref byteboard bb, square sq) {
+    bb[sq] = 0;
+}
+void move(ref byteboard bb, square fromSq, square toSq) {
+    bb[toSq] = bb[fromSq];
+    bb[fromSq] = 0;
+}
 
 uint file(square sq) { return sq & 7; }
 uint rank(square sq) { return sq >>> 3; }
@@ -50,6 +59,7 @@ string algebraic(square sq) {
  */
 alias bitboard = ulong;
    
+/+
 alias nibbleboard = uint[8];
 
 Piece pieceAt(ref nibbleboard bb, square sq) {
@@ -62,11 +72,35 @@ Side sideAt(ref nibbleboard bb, square sq) {
     auto b = ((sq & 7) << 2) + 3; 
     return ((bb[a] >>> b) & 1).as!Side;
 }
+uint get(ref nibbleboard bb, square sq) {
+    auto a = sq >>> 3;
+    auto b = (sq & 7) << 2; 
+    return (bb[a] >>> b) & 15;
+}
 void set(ref nibbleboard bb, square sq, Piece p, Side s) {
     uint a = sq >>> 3;
     uint b = (sq & 7) << 2;
     bb[a] &= ~(15 << b);
     bb[a] |= ((p | (s<<3)) << b);
 }
+void setEmpty(ref nibbleboard bb, square sq) {
+    uint a = sq >>> 3;
+    uint b = (sq & 7) << 2;
+    bb[a] &= ~(15 << b);
+}
+void move(ref nibbleboard bb, square fromSq, square toSq) {
+    auto f1 = fromSq >>> 3;
+    auto f2 = (fromSq & 7) << 2; 
 
+    auto t1 = toSq >>> 3;
+    auto t2 = (toSq & 7) << 2; 
+
+    uint value = (bb[f1] >>> f2) & 15;
+
+    bb[t1] &= ~(15 << t2);
+    bb[t1] |= (value << t2);
+
+    bb[f1] &= ~(15 << f2);
+}
++/
 

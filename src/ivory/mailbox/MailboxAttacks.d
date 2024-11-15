@@ -25,15 +25,15 @@ bool isSquareAttackedByPawn(ref byteboard bb, square sq, int rank, int file, Sid
         enum whitePawn = Piece.PAWN | (Side.WHITE<<3);
         if(rank > 1) {
             // white
-            if(file > 0 && bb[sq - 9] == whitePawn) return true;
-            if(file < 7 && bb[sq - 7] == whitePawn) return true;
+            if(file > 0 && bb.get(sq - 9) == whitePawn) return true;
+            if(file < 7 && bb.get(sq - 7) == whitePawn) return true;
         }
     } else {
         enum blackPawn = Piece.PAWN | (Side.BLACK<<3);
         if(rank < 6) {
             // black
-            if(file > 0 && bb[sq + 7] == blackPawn) return true;
-            if(file < 7 && bb[sq + 9] == blackPawn) return true;
+            if(file > 0 && bb.get(sq + 7) == blackPawn) return true;
+            if(file < 7 && bb.get(sq + 9) == blackPawn) return true;
         }
     }
     return false;
@@ -45,24 +45,24 @@ bool isSquareAttackedByKnight(ref byteboard bb, square sq, int rank, int file, S
     enum LOOKUP = false;
     static if(LOOKUP) {
         foreach(target; knightMoves(sq)) {
-            if(bb[target] == knight) return true;
+            if(bb.get(target) == knight) return true;
         }
     } else {
         if(rank < 6) {
-            if(file > 0 && bb[sq + 15] == knight) return true;
-            if(file < 7 && bb[sq + 17] == knight) return true;
+            if(file > 0 && bb.get(sq + 15) == knight) return true;
+            if(file < 7 && bb.get(sq + 17) == knight) return true;
         }
         if(rank > 1) {
-            if(file > 0 && bb[sq - 17] == knight) return true;
-            if(file < 7 && bb[sq - 15] == knight) return true;
+            if(file > 0 && bb.get(sq - 17) == knight) return true;
+            if(file < 7 && bb.get(sq - 15) == knight) return true;
         }
         if(file < 6) {
-            if(rank < 7 && bb[sq + 10] == knight) return true;
-            if(rank > 0 && bb[sq - 6]  == knight) return true;
+            if(rank < 7 && bb.get(sq + 10) == knight) return true;
+            if(rank > 0 && bb.get(sq - 6)  == knight) return true;
         }
         if(file > 1) {
-            if(rank < 7 && bb[sq + 6]  == knight) return true;
-            if(rank > 0 && bb[sq - 10] == knight) return true;
+            if(rank < 7 && bb.get(sq + 6)  == knight) return true;
+            if(rank > 0 && bb.get(sq - 10) == knight) return true;
         }
     }
     return false;
@@ -71,28 +71,28 @@ bool isSquareAttackedByKing(ref byteboard bb, square sq, int rank, int file, Sid
     uint king  = Piece.KING | (bySide<<3);
 
     if(file > 0) {
-        if(bb[sq - 1] == king) return true;	// left
+        if(bb.get(sq - 1) == king) return true;	// left
         if(rank > 0) {
-            if(bb[sq - 9] == king) return true;	// down left
+            if(bb.get(sq - 9) == king) return true;	// down left
         }
         if(rank < 7) {
-            if(bb[sq + 7] == king) return true;	// up left
+            if(bb.get(sq + 7) == king) return true;	// up left
         }
     }
     if(file < 7) {
-        if(bb[sq + 1] == king) return true;	// right
+        if(bb.get(sq + 1) == king) return true;	// right
         if(rank > 0) {
-            if(bb[sq - 7] == king) return true; // down right
+            if(bb.get(sq - 7) == king) return true; // down right
         }
         if(rank < 7) {
-            if(bb[sq + 9] == king) return true; // up right
+            if(bb.get(sq + 9) == king) return true; // up right
         }
     }
     if(rank > 0) {
-        if(bb[sq - 8] == king) return true;	// down
+        if(bb.get(sq - 8) == king) return true;	// down
     }
     if(rank < 7) {
-        if(bb[sq + 8] == king) return true;	// up
+        if(bb.get(sq + 8) == king) return true;	// up
     }
     return false;
 }
@@ -106,8 +106,9 @@ bool isSquareAttackedOnDiagonal(ref byteboard bb, square sq, uint rank, uint fil
         square s = sq + sqDelta;
 
         while(f < 8u && r < 8u) {
-            if(bb[s] != 0) {
-                if(bb[s] == bishop || bb[s] == queen) return true;
+            auto val = bb.get(s);
+            if(val != 0) {
+                if(val == bishop || val == queen) return true;
                 break;
             }
             f += fileDelta;
@@ -131,8 +132,9 @@ bool isSquareAttackedOnFileOrRank(ref byteboard bb, square sq, int rank, int fil
         square s = sq + delta;
 
         while(f < 8u) {
-            if(bb[s] != 0) {
-                if(bb[s] == rook || bb[s] == queen) return true; 
+            auto val = bb.get(s);
+            if(val != 0) {
+                if(val == rook || val == queen) return true; 
                 break;
             }
             f += delta;
@@ -146,8 +148,9 @@ bool isSquareAttackedOnFileOrRank(ref byteboard bb, square sq, int rank, int fil
         square s = sq + sqDelta;
 
         while(r < 8u) {
-            if(bb[s] != 0) {
-                if(bb[s] == rook || bb[s] == queen) return true; 
+            auto val = bb.get(s);
+            if(val != 0) {
+                if(val == rook || val == queen) return true; 
                 break;
             }
             r += rankDelta;

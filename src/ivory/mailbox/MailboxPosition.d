@@ -47,33 +47,32 @@ public:
     FEN getFEN() {
         return new FEN(state.board, state.sideToMove, state.castlingPermissions, state.enPassantTargetSquare, state.halfMoveClock, state.fullMoveNumber);
     }
-    ubyte get(square sq) {
-        return state.board[sq];
+    uint get(square sq) {
+        return state.board.get(sq);
     }
     void set(square sq, Piece piece, Side side) {
-        state.board[sq] = (piece | (side << 3)).as!ubyte; 
+        state.board.set(sq, piece, side);
     }
     void setEmpty(square sq) {
-        state.board[sq] = 0;
+        state.board.setEmpty(sq);
     }
     void movePiece(square from, square to) {
-        state.board[to] = state.board[from];
-        state.board[from] = 0;
+        state.board.move(from, to);
     }
     bool isEmpty(square sq) {
-        return state.board[sq] == 0;
+        return state.board.get(sq) == 0;
     }
     bool isOccupied(square sq) {
-        return state.board[sq] != 0;
+        return state.board.get(sq) != 0;
     }
     bool isOccupiedBy(square sq, Piece p, Side s) {
-        return state.board[sq] == (p | (s<<3));
+        return state.board.get(sq) == (p | (s<<3));
     }
     Piece pieceAt(square sq) {
-        return (state.board[sq] & 0b111).as!Piece;
+        return state.board.pieceAt(sq);
     }
     Side sideAt(square sq) {
-        return ((state.board[sq] & 0b1000) >>> 3).as!Side;
+        return state.board.sideAt(sq);
     }
     bool isSquareAttacked(square sq, Side bySide) {
         return .squareIsAttacked(state.board, sq, bySide);
@@ -81,18 +80,25 @@ public:
     square kingSquare(Side side) {
         return side == Side.WHITE ? state.whiteKingSquare : state.blackKingSquare;
     }
+    void setKingSquare(square sq, Side side) {
+        if(side == Side.WHITE) {
+            state.whiteKingSquare = sq;
+        } else {
+            state.blackKingSquare = sq;
+        }
+    }
     bool canCastleKingSide() {
         return .canCastleKingSide(state.castlingPermissions, state.sideToMove);
     }
     bool canCastleQueenSide() {
         return .canCastleQueenSide(state.castlingPermissions, state.sideToMove);
     }
-    override string toString() const {
+    override string toString() {
         string buf;
         for(int rank = 7; rank >= 0; rank--) {
             buf ~= "%s |".format(rank+1);
             for(int file = 0; file < 8; file++) {
-                ubyte b = state.board[file + (rank<<3)];
+                auto b = state.board.get(file + (rank<<3));
                 if(b==0) {
                     buf ~= "· ";
                 } else {

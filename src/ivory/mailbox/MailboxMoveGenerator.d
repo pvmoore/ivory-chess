@@ -81,10 +81,10 @@ private:
         } 
     }
     void addCapture(square from, square to) {
-        addMove(Move(from, to, Move.Flag.NONE, Move.Flag2.CAPTURE));
+        addMove(Move(from, to, Move.Flag.CAPTURE));
     }
     void addCapture(square from, square to, Move.Flag flag) {
-        addMove(Move(from, to, flag, Move.Flag2.CAPTURE));
+        addMove(Move(from, to, flag));
     }
 
     void generateForSquare(square sq, Piece piece) {
@@ -137,9 +137,9 @@ private:
         // moves
         if(pos.isEmpty(sq + UP)) {
             if(rank == START_RANK) {
-                addMove(Move(sq, sq + UP, Move.Flag.PAWN_MOVE));
+                addMove(Move(sq, sq + UP));
                 if(pos.isEmpty(sq + UP2)) {
-                    addMove(Move(sq, sq + UP2, Move.Flag.PAWN_MOVE));
+                    addMove(Move(sq, sq + UP2));
                 }
             } else if(rank==PROMOTE_FROM_RANK) {
                 addMove(Move(sq, sq + UP, Move.Flag.PROMOTE_QUEEN));
@@ -147,7 +147,7 @@ private:
                 addMove(Move(sq, sq + UP, Move.Flag.PROMOTE_KNIGHT));
                 addMove(Move(sq, sq + UP, Move.Flag.PROMOTE_BISHOP));
             } else {
-                addMove(Move(sq, sq + UP, Move.Flag.PAWN_MOVE));
+                addMove(Move(sq, sq + UP));
             }
         }
         // attacks (up and left)
@@ -159,7 +159,7 @@ private:
                     addCapture(sq, sq + UP_LEFT, Move.Flag.PROMOTE_BISHOP);
                     addCapture(sq, sq + UP_LEFT, Move.Flag.PROMOTE_KNIGHT);
                 } else {
-                    addCapture(sq, sq + UP_LEFT, Move.Flag.PAWN_MOVE);
+                    addCapture(sq, sq + UP_LEFT);
                 }
             }
         }
@@ -172,7 +172,7 @@ private:
                     addCapture(sq, sq + UP_RIGHT, Move.Flag.PROMOTE_BISHOP);
                     addCapture(sq, sq + UP_RIGHT, Move.Flag.PROMOTE_KNIGHT);
                 } else {
-                    addCapture(sq, sq + UP_RIGHT, Move.Flag.PAWN_MOVE);
+                    addCapture(sq, sq + UP_RIGHT);
                 }
             }
         }
@@ -317,8 +317,8 @@ private:
                 // if(stillInCheck) return;
             }
 
-            auto flag2 = pos.isOccupied(target) ? Move.Flag2.CAPTURE : Move.Flag2.NONE;
-            addMove(Move(sq, target, Move.Flag.NONE, flag2), inCheck);
+            auto flag = pos.isOccupied(target) ? Move.Flag.CAPTURE : Move.Flag.NONE;
+            addMove(Move(sq, target, flag), inCheck);
         }
 
         if(file > 0) {
@@ -362,7 +362,7 @@ private:
                 if(!pos.isSquareAttacked(sq + 1, enemy) &&
                    !pos.isSquareAttacked(sq + 2, enemy))
                 {
-                    addMove(Move(sq, sq + 2, Move.Flag.CASTLE, Move.Flag2.NONE), false);
+                    addMove(Move(sq, sq + 2, Move.Flag.CASTLE), false);
                 }
             }
         }
@@ -371,7 +371,7 @@ private:
                 if(!pos.isSquareAttacked(sq - 1, enemy) &&
                    !pos.isSquareAttacked(sq - 2, enemy))
                 {
-                    addMove(Move(sq, sq - 2, Move.Flag.CASTLE, Move.Flag2.NONE), false);
+                    addMove(Move(sq, sq - 2, Move.Flag.CASTLE), false);
                 }
             }
         }

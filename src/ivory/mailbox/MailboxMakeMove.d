@@ -9,36 +9,31 @@ import ivory.all;
 void makeMoveOnBoardOnly(ref byteboard board, Move m, Side side) {
     square from = m.from();
     square to = m.to();
-    Piece movePiece = (board[from] & PIECE_MASK).as!Piece;
+    Piece movePiece = board.pieceAt(from); 
 
-    board[to] = board[from];
-    board[from] = 0;
+    board.move(from, to);
 
     if(m.isPromotion()) {
-        board[to] = (m.promotionPiece() | (side<<3)).as!ubyte;
+        board.set(to, m.promotionPiece(), side);
     }
     if(m.isEnPassantCapture()) {
         int offset = side == Side.WHITE ? -8 : 8; 
-        board[to + offset] = 0;
+        board.setEmpty(to + offset);
     }
     if(movePiece == Piece.KING) {
         if(m.isCastle()) {
             bool queenSide = from > to;
             if(side == Side.WHITE) {
                 if(queenSide) {
-                    board[3] = board[0];
-                    board[0] = 0;
+                    board.move(0, 3);
                 } else {
-                    board[5] = board[7];
-                    board[7] = 0;
+                    board.move(7, 5);
                 }
             } else {
                 if(queenSide) {
-                    board[59] = board[56];
-                    board[56] = 0;
+                    board.move(56, 59);
                 } else {
-                    board[61] = board[63];
-                    board[63] = 0;
+                    board.move(63, 61);
                 }
             }
         }
@@ -53,11 +48,7 @@ void makeMove(MailboxPosition pos, Move m) {
     assert(movePiece != Piece.NONE);
 
     // Calculate capture piece
-    Piece capture = pos.pieceAt(to);
-    if(m.isEnPassantCapture()) {
-        assert(movePiece == Piece.PAWN);
-        capture = Piece.PAWN;
-    }
+    Piece capture = m.isEnPassantCapture() ? Piece.PAWN : pos.pieceAt(to);
 
     // Store history
     MailboxPosition.History history = {
@@ -69,22 +60,15 @@ void makeMove(MailboxPosition pos, Move m) {
     };
     pos.history.push(history);
 
-    pos.state.halfMoveClock++;
-
-    if(capture != Piece.NONE) {
-        // Remove castling permissions if a rook was captured
-        if(capture == Piece.ROOK) {
-            if(to == 0) removePermission(pos.state.castlingPermissions, Castling.WHITE_OOO);
-            if(to == 7) removePermission(pos.state.castlingPermissions, Castling.WHITE_OO);
-            if(to == 56) removePermission(pos.state.castlingPermissions, Castling.BLACK_OOO);
-            if(to == 63) removePermission(pos.state.castlingPermissions, Castling.BLACK_OO);
-        }
-        // Capture resets the half move clock
-        pos.state.halfMoveClock = 0;
-    }
+    // Update castling permissions based on the to and from squares
+    pos.state.castlingPermissions &= FROM_SQ_CASTLE_MASKS[from];
+    pos.state.castlingPermissions &= FROM_SQ_CASTLE_MASKS[to];
 
     // Remove en passant target (may be added back later if this is a pawn move)
     pos.state.enPassantTargetSquare = NO_SQUARE;
+
+    // Update the half move clock
+    pos.state.halfMoveClock = (capture == Piece.NONE && movePiece != Piece.PAWN) ? pos.state.halfMoveClock + 1 : 0;
 
     // Move the piece
     pos.movePiece(from, to);
@@ -94,7 +78,7 @@ void makeMove(MailboxPosition pos, Move m) {
             pos.set(to, m.promotionPiece(), side);
         }
 
-        //Remove the captured pawn if this is an enpassant capture
+        // Remove the captured pawn if this is an enpassant capture
         if(m.isEnPassantCapture()) {
             int offset = side == Side.WHITE ? -8 : 8; 
             pos.setEmpty(to + offset);
@@ -105,49 +89,16 @@ void makeMove(MailboxPosition pos, Move m) {
             pos.state.enPassantTargetSquare = (from + to) >>> 1;
         } 
 
-        // Pawn move resets the half move clock
-        pos.state.halfMoveClock = 0;
-    } else if(movePiece == Piece.ROOK) {
-        // Remove castling permissions
-        if(from == 0) removePermission(pos.state.castlingPermissions, Castling.WHITE_OOO);
-        if(from == 7) removePermission(pos.state.castlingPermissions, Castling.WHITE_OO);
-        if(from == 56) removePermission(pos.state.castlingPermissions, Castling.BLACK_OOO);
-        if(from == 63) removePermission(pos.state.castlingPermissions, Castling.BLACK_OO);
     } else if(movePiece == Piece.KING) {
         // Castling - move the rook
         if(m.isCastle()) {
             bool queenSide = from > to;
-            if(side == Side.WHITE) {
-                if(queenSide) {
-                    assert(pos.canCastleQueenSide());
-                    assert(pos.isOccupiedBy(0, Piece.ROOK, Side.WHITE));
-                    pos.movePiece(0, 3);
-                } else {
-                    assert(pos.canCastleKingSide());
-                    assert(pos.isOccupiedBy(7, Piece.ROOK, Side.WHITE));
-                    pos.movePiece(7, 5);
-                }
-            } else {
-                if(queenSide) {
-                    assert(pos.canCastleQueenSide());
-                    assert(pos.isOccupiedBy(56, Piece.ROOK, Side.BLACK));
-                    pos.movePiece(56, 59);
-                } else {
-                    assert(pos.canCastleKingSide());
-                    assert(pos.isOccupiedBy(63, Piece.ROOK, Side.BLACK));
-                    pos.movePiece(63, 61);
-                }
-            }
+            square rookFrom = queenSide ? from - 4 : from + 3;
+            square rookTo   = queenSide ? from - 1 : from + 1;
+            pos.movePiece(rookFrom, rookTo);
         }
         // Update king position cache
-        // Remove castling permissions
-        if(side == Side.WHITE) {
-            pos.state.whiteKingSquare = to;
-            removePermission(pos.state.castlingPermissions, Castling.WHITE_OO | Castling.WHITE_OOO);
-        } else {
-            pos.state.blackKingSquare = to;
-            removePermission(pos.state.castlingPermissions, Castling.BLACK_OO | Castling.BLACK_OOO);
-        }
+        pos.setKingSquare(to, side); 
     }
 
     pos.state.sideToMove = side.opposite();
@@ -155,7 +106,7 @@ void makeMove(MailboxPosition pos, Move m) {
 }
 /*
 // This appears to be slower than just copying the board and then throwing it away
-void unmakeMoveBoardOnly(ref byteboard board, Move m, Side side, ubyte toSqValue) {
+void unmakeMoveBoardOnly(ref boardtype board, Move m, Side side, ubyte toSqValue) {
     square from = m.from();
     square to = m.to();
     Piece movePiece = m.isPromotion() ? Piece.PAWN : (board[to] & PIECE_MASK).as!Piece;
@@ -194,7 +145,7 @@ void unmakeMoveBoardOnly(ref byteboard board, Move m, Side side, ubyte toSqValue
 //     uint castlingPermissions;
 //     square enPassantTargetSquare;
 //     Side sideToMove;
-//     byteboard board;
+//     boardtype board;
 //     // Optimisation
 //     square whiteKingSquare;
 //     square blackKingSquare;
@@ -234,47 +185,25 @@ void unmakeMove(MailboxPosition pos) {
         pos.set(to, capture, enemy);
     }
 
-    switch(movePiece) {
-        case Piece.PAWN:
-            if(m.isEnPassantCapture()) {
-                square sq = (side == Side.WHITE) ? to - 8 : to + 8;
-                pos.set(sq, Piece.PAWN, enemy);
+    if(movePiece == Piece.PAWN) {
+        if(m.isEnPassantCapture()) {
+            square sq = (side == Side.WHITE) ? to - 8 : to + 8;
+            pos.set(sq, Piece.PAWN, enemy);
 
-            } else if(m.isPromotion()) {
-                // Replace promotion piece with pawn
-                pos.set(from, Piece.PAWN, side);
+        } else if(m.isPromotion()) {
+            // Replace promotion piece with pawn
+            pos.set(from, Piece.PAWN, side);
+        } 
+    } else if(movePiece == Piece.KING) {
+        // Castling - move the rook
+        if(m.isCastle()) {
+            bool queenSide = from > to;
+            square rookFrom = queenSide ? from - 1 : from + 1;
+            square rookTo = queenSide ? from - 4 : from + 3;
+            pos.movePiece(rookFrom, rookTo);
+        } 
 
-            } 
-            break;
-        case Piece.KING:
-            if(m.isCastle()) {
-                // Move the rook
-                bool queenSide = from > to;
-                square rookFrom = queenSide ? from - 1 : from + 1;
-                square rookTo = queenSide ? from - 4 : from + 3;
-
-                pos.movePiece(rookFrom, rookTo);
-
-                // Update whiteKingPos, blackKingPos 
-                if(side == Side.WHITE) {
-                    pos.state.whiteKingSquare = 4;
-                } else {
-                    pos.state.blackKingSquare = 60;
-                }
-
-            } else {
-                // Normal king move
-
-                // Update whiteKingPos, blackKingPos 
-                if(side == Side.WHITE) {
-                    pos.state.whiteKingSquare = from;
-                } else {
-                    pos.state.blackKingSquare = from;
-                }
-            }
-            break;
-        default:
-            // Knight, bishop, rook or queen
-            break;
+        // Update king position cache
+        pos.setKingSquare(from, side); 
     }
 }

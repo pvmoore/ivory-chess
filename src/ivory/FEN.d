@@ -53,7 +53,7 @@ private:
         for(int r = 7; r>=0; r--) {
             int count = 0;
             for(int f = 0; f < 8; f++) {
-                ubyte b = board[f + r*8];
+                auto b = board.get(f + r*8);
                 if(b == 0) {
                     count++;
                 } else {
@@ -126,7 +126,7 @@ private:
             }
 
             foreach(n; 0..count) {
-                board[rank+file] = (piece | (side << 3)).as!ubyte;
+                board.set(rank+file, piece, side);
                 file++;
             }
         }

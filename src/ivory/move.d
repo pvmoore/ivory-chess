@@ -2,7 +2,7 @@ module ivory.Move;
 
 import ivory.all;
 
-enum NO_MOVE = Move(0, 0, Move.Flag.NONE, Move.Flag2.NONE);
+enum NO_MOVE = Move(0, 0, Move.Flag.NONE);
 
 /**
  * [0 000 000000 000000] 16 bits
@@ -10,7 +10,7 @@ enum NO_MOVE = Move(0, 0, Move.Flag.NONE, Move.Flag2.NONE);
  *  | |   |      from
  *  | |   to
  *  | flag
- *  flag2
+ *  unused
  */
 struct Move {
 public:
@@ -21,26 +21,24 @@ public:
         PROMOTE_ROOK      = 3,
         PROMOTE_QUEEN     = 4,
         CASTLE            = 5,
-        ENPASSANT_CAPTURE = 6,  // assumes Flag2 == Flag2.CAPTURE, implies PAWN_MOVE
-        PAWN_MOVE         = 7   
-    }
-    enum Flag2 { // 1 bit
-        NONE             = 0,
-        CAPTURE          = 1
+        ENPASSANT_CAPTURE = 6,  
+        CAPTURE           = 7   
     }
 
-    this(square from, square to, Flag flag = Flag.NONE, Flag2 flag2 = Flag2.NONE) {
+    this(square from, square to) {
+        data |= (from).as!ushort;
+        data |= (to<<6).as!ushort;
+    }
+    this(square from, square to, Flag flag = Flag.NONE) {
         data |= (from).as!ushort;
         data |= (to<<6).as!ushort;
         data |= (flag<<12).as!ushort;
-        data |= (flag2<<15).as!ushort;
     }
 
     /** Calculate board square from algebraic string eg. "a2a4" */
     static Move fromAlgebraic(string s) {
         if(s.length < 4) return NO_MOVE;
         Flag flag = Flag.NONE;
-        Flag2 flag2 =  Flag2.NONE;
         uint f1 = s[0] - 'a';
         uint r1 = s[1] - '1';
         if(f1 > 7 || r1 > 7) return NO_MOVE;
@@ -48,7 +46,7 @@ public:
         uint i = 2;
         if(s[i]=='x') {
             i++;
-            flag2 = Flag2.CAPTURE;
+            flag = Flag.CAPTURE;
         }
 
         uint f2 = s[i++] - 'a';
@@ -67,15 +65,13 @@ public:
                 default: return NO_MOVE;
             }
         }
-        return Move(from, to, flag, flag2);
+        return Move(from, to, flag);
     }
 
     square from() { return data & 0b111111; }
     square to() { return (data >>> 6) & 0b111111; }
-    bool isCapture() { return flag2() == Flag2.CAPTURE; }
     bool isCastle() { return flag() == Flag.CASTLE; }
     bool isEnPassantCapture() { return flag() == Flag.ENPASSANT_CAPTURE; }
-    bool isPawnMove() { return flag() == Flag.PAWN_MOVE || flag() == Flag.ENPASSANT_CAPTURE; }
     bool isPromotion() {
         Flag f = flag();
         return f==Flag.PROMOTE_BISHOP ||
@@ -104,6 +100,7 @@ public:
 private:
     ushort data;
 
+    bool isCapture() { return flag() == Flag.CAPTURE; }
+
     Flag flag() { return ((data >>> 12) & 0b111).as!Flag; }
-    Flag2 flag2() { return ((data >>> 15) & 1).as!Flag2; }
 }

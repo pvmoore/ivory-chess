@@ -33,7 +33,7 @@ private:
 
 enum VERBOSE    = false;
 enum MAX_NODES  = 10_000_000;     // 728 scenarios, 10,400 ms -->  8,800ms
-//enum MAX_NODES  = ulong.max;      // 764 scenarios, 546,490.15 ms --> 450,000ms
+//enum MAX_NODES  = ulong.max;      // 764 scenarios, 546,490.15 ms --> 434,000ms
 
 __gshared PerftScenario[] SCENARIOS;
 __gshared PerftScenario[] OVERRIDE_SCENARIOS = [
