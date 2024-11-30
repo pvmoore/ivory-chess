@@ -22,11 +22,13 @@ void testBoards() {
         pieces ~= (uniform(0,6) + 1).as!Piece;
         sides ~= uniform01 > 0.5 ? Side.WHITE : Side.BLACK;
     }
-    // writefln("squares = %s", squares);
-    // writefln("pieces  = %s", pieces);
-    // writefln("sides   = %s", sides);
 
     testByteboard(squares, pieces, sides);
+    testBitboard(squares, pieces, sides);
+
+    testBitboardFunctions();
+
+    
 }
 
 void testByteboard(square[] squares, Piece[] pieces, Side[] sides) {
@@ -37,10 +39,85 @@ void testByteboard(square[] squares, Piece[] pieces, Side[] sides) {
     watch.start();
     foreach(i; 0..1000000) {
         foreach(j; 0..squares.length) {
-            set(bb, squares[j], pieces[j], sides[j]);
+            square sq = squares[j];
+            Side s = sides[j];
+            Piece p = pieces[j];
+            set(bb, sq, p, s);
         }
     }
     watch.stop();
     writefln("bb = %s", iota(0, 64).map!(i=>fenChar(pieceAt(bb, i), sideAt(bb, i))).array);
     writefln("Elapsed %.2f ms", watch.peek().total!"nsecs" / 1_000_000.0);
 }
+void testBitboard(square[] squares, Piece[] pieces, Side[] sides) {
+    auto watch = StopWatch(AutoStart.no);
+
+    bitboard[2] sideBoards;
+    // [0] white;
+    // [1] black;
+
+    bitboard[6] pieceBoards;
+    // [0] pawns;
+    // [1] bishops;
+    // [2] knights;
+    // [3] rooks;
+    // [4] queens;
+    // [5] kings;
+
+    watch.start();
+    foreach(i; 0..1000000) {
+        foreach(j; 0..squares.length) {
+            square sq = squares[j];
+            uint s = sides[j].as!uint;
+            uint p = pieces[j].as!uint - 1;
+
+            set(sideBoards[s], sq);
+            set(pieceBoards[p], sq);
+        }
+    }
+    watch.stop();
+    writefln("Elapsed %.2f ms", watch.peek().total!"nsecs" / 1_000_000.0);
+}
+void testBitboardFunctions() {
+    bitboard bb;
+
+    set(bb, 0);
+    throwIf(bb != 1);
+
+    set(bb, 1);
+    throwIf(bb != 3);
+
+    set(bb, 3);
+    throwIf(bb != 0b1011);
+
+    unset(bb, 1);
+    throwIf(bb != 0b1001);
+
+    move(bb, 3, 5);
+    throwIf(bb != 0b100001);
+
+    move(bb, 1, 2);
+    throwIf(bb != 0b100001);
+
+    move(bb, 1, 0);
+    throwIf(bb != 0b100000);
+
+    move(bb, 5, 4);
+    throwIf(bb != 0b010000);
+
+    throwIf(bb.pop() != 4);
+    throwIf(bb != 0); 
+
+    bb.set(33);
+    bb.set(55);
+    throwIf(bb != ((1L<<33) | (1L<<55)));
+
+    throwIf(bb.pop() != 33);
+    throwIf(bb != (1L<<55));
+
+    throwIf(bb.pop() != 55);
+    throwIf(bb != 0);
+
+    writefln("ok"); 
+}
+

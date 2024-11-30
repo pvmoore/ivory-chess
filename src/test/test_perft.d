@@ -27,13 +27,29 @@ void testPerft() {
     }
 
     testMailboxPerft(scenarios);
+    writefln("Perft tests passed%s", VALIDATE ? " (with validation)" : "");
 }
 
 private:
 
-enum VERBOSE    = false;
-enum MAX_NODES  = 10_000_000;     // 728 scenarios, 10,400 ms -->  8,800ms
-//enum MAX_NODES  = ulong.max;      // 764 scenarios, 546,490.15 ms --> 434,000ms
+enum VERBOSE  = false;
+enum VALIDATE = true;
+
+/**
+ * 10,400 ms -->  
+ * 8,800 ms --> 
+ * 8,200 ms 
+ * (728 scenarios)
+ */
+enum MAX_NODES = 10_000_000;     
+
+/**
+ * 546,490 ms --> 
+ * 434,000 ms -->
+ * 420,000 ms
+ * (764 scenarios)
+ */
+//enum MAX_NODES = ulong.max;      
 
 __gshared PerftScenario[] SCENARIOS;
 __gshared PerftScenario[] OVERRIDE_SCENARIOS = [
@@ -92,16 +108,16 @@ PerftScenario[] loadPerftScenarios() {
 
 void testMailboxPerft(PerftScenario[] scenarios) {
     writefln("Using Mailbox position:");
-    auto moveGen = new MailboxMoveGenerator();
+    auto moveGen = new MBMoveGenerator();
+    auto eval = new MBEvaluator();
     auto watch = StopWatch(AutoStart.no);
 
     foreach(i, s; scenarios) {
-        auto pos = new MailboxPosition();
-        pos.fromFEN(s.fen);
+        auto pos = createMailboxPosition(s.fen);
         writefln("  [%s/%s] %s", i+1, scenarios.length, s);
         //writefln("%s", pos);
 
-        ulong nodesFound = runSinglePerftTest(moveGen, pos, s.depth, watch);
+        ulong nodesFound = runSinglePerftTest(moveGen, eval, pos, s.depth, watch);
 
         throwIf(moveGen.getMoves().length != 0);
         throwIf(nodesFound != s.nodes, "Expected %s nodes but found %s", s.nodes, nodesFound);
@@ -110,7 +126,7 @@ void testMailboxPerft(PerftScenario[] scenarios) {
     writefln("Elapsed %.2f ms", watch.peek().total!"nsecs" / 1_000_000.0);
 }
 
-ulong runSinglePerftTest(MailboxMoveGenerator moveGen, MailboxPosition pos, int depth, ref StopWatch watch) {
+ulong runSinglePerftTest(MBMoveGenerator moveGen, MBEvaluator eval, MBPosition pos, int depth, ref StopWatch watch) {
     ulong totalNodes = 0;
 
     watch.start();
@@ -118,7 +134,7 @@ ulong runSinglePerftTest(MailboxMoveGenerator moveGen, MailboxPosition pos, int 
     enum SELECT_MOVE = -1;
     
     // Generate outer moves
-    uint numMoves = moveGen.generate(pos);
+    uint numMoves = moveGen.generate(pos, false);
 
     foreach(i; 0..numMoves) {
         Move m = moveGen.popMove();
@@ -127,17 +143,19 @@ ulong runSinglePerftTest(MailboxMoveGenerator moveGen, MailboxPosition pos, int 
 
         static if(VERBOSE) writefln("  %s", m);
         pos.makeMove(m);
-        ulong nodes = perft(moveGen, pos, depth - 1);
+        ulong nodes = perft(moveGen, eval, pos, depth - 1);
         totalNodes += nodes;
         pos.unmakeMove();
         static if(VERBOSE) writefln("[%s] %s %s nodes", i, m, nodes);
+
+        static if(VALIDATE) validate(pos, m);
     }
 
     watch.stop();
     return totalNodes;
 }
 
-ulong perft(MailboxMoveGenerator moveGen, MailboxPosition pos, int depth) {
+ulong perft(MBMoveGenerator moveGen, MBEvaluator eval, MBPosition pos, int depth) {
 
     if(depth == 0) return 1;
 
@@ -145,17 +163,25 @@ ulong perft(MailboxMoveGenerator moveGen, MailboxPosition pos, int depth) {
 
     static if(VERBOSE) writefln("  %s\n%s", pos.getFEN(), pos);
 
-    uint numMoves = moveGen.generate(pos);
+    uint numMoves = moveGen.generate(pos, false);
 
     foreach(i; 0..numMoves) {
         Move m = moveGen.popMove();
         static if(VERBOSE) writefln("  %s", m);
         if(depth == 1) {
             leafNodes++;
+
+            static if(VALIDATE) validate(pos, m);
+
+            //int e = eval.evaluate(pos);
         } else {
             pos.makeMove(m);
-            leafNodes += perft(moveGen, pos, depth - 1);
+            static if(VALIDATE) validate(pos, m);
+
+            leafNodes += perft(moveGen, eval, pos, depth - 1);
             pos.unmakeMove();
+
+            static if(VALIDATE) validate(pos, m);
         }
     }
 

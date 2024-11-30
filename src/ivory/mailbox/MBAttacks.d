@@ -1,4 +1,4 @@
-module ivory.mailbox.MailboxAttacks;
+module ivory.mailbox.MBAttacks;
 
 import ivory.all;
 
@@ -18,7 +18,7 @@ bool squareIsAttacked(ref byteboard bb, square sq, Side bySide) {
 }
 
 //──────────────────────────────────────────────────────────────────────────────────────────────────
-//private:
+private:
 
 bool isSquareAttackedByPawn(ref byteboard bb, square sq, int rank, int file, Side bySide) {
     if(bySide == Side.WHITE) {

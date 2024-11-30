@@ -1,4 +1,4 @@
-module ivory.MoveList;
+module ivory.move.MoveList;
 
 import ivory.all;
 
@@ -16,6 +16,10 @@ public:
     Move pop() {
         assert(pos > 0);
         return moves[--pos];
+    }
+    void discard(uint numMoves) {
+        assert(pos - numMoves >= 0);
+        pos -= numMoves;
     }
     bool contains(Move m) {
         return moves[0..pos].any!(it=>it == m);

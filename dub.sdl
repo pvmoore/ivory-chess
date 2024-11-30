@@ -26,7 +26,7 @@ configuration "test" {
 
 # local
 dependency "common" version="~master"
-#dependency "maths" version="~master"
-#dependency "logging" version="~master"
+dependency "maths" version="~master"
+dependency "logging" version="~master"
 
 # external

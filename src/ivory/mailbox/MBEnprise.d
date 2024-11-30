@@ -1,4 +1,4 @@
-module ivory.mailbox.MailboxEnprise;
+module ivory.mailbox.MBEnprise;
 
 import ivory.all;
 /+

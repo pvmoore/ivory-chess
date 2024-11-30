@@ -1,6 +1,5 @@
 module ivory.Ivory;
 
-import std.stdio 	: writefln, writef, readln;
 import std.string 	: split, indexOf;
 import core.memory  : GC;
 
@@ -17,7 +16,7 @@ public:
     void repl() {
         try{
             while(running) {
-                string line = readln();
+                string line = uciReadLine();
                 string[] tokens = split(line).as!(string[]);
                 if(tokens.length == 0) continue;
 
@@ -31,47 +30,41 @@ private:
     Game game;
     bool running = true;
 
+    /** 
+    go wtime 300000 btime 300000 movestogo 40
+        bestmove d2d4 ponder d7d5
+
+    position startpos moves d2d4
+    isready
+        readyok    
+     */
+
     void handleCommand(string command, string line, string[] tokens) {
         switch(command) {
             // ###############################################################################
             // UCI commands from GUI
             // ###############################################################################
             case "uci":
-                writefln("id name %s", NAME);
-                writefln("uciok");
+                uciWriteLine("id name %s", NAME);
+                uciWriteLine("uciok");
                 break;
             case "ucinewgame":
-                game = newGame();
+                handleUcinewgame(tokens, line);
                 break;
             case "debug":
                 // debug [ on | off ]
                 break;
             case "isready":
-                writefln("readyok");
+                uciWriteLine("readyok");
                 break;
-            case "position": {
-                // position [fen <fenstring> | startpos ]  moves <move1> .... <movei>
-                string sub = tokens.length > 1 ? tokens[1] : "";
-                auto movesPos = line.indexOf("moves"); 
-                FEN fen;
-                if("fen" == sub) {
-                    auto fenPos = line.indexOf("fen") + 4;
-                    string fenStr = line[fenPos..maxOf(movesPos, line.length)];
-                    fen = new FEN(fenStr);
-                } else if("startpos" == sub) {
-                    fen = FEN.START_POSITION;
-                }
-                game.setPosition(fen);
-
-                if(movesPos != -1) {
-                    // todo - apply moves 
-                }
+            case "position": 
+                handlePosition(tokens, line);
                 break; 
-            }
             case "setoption":
-                // setoption name <id> [value <x>]
+                handleSetoption(tokens, line);
                 break;
             case "go":
+                handleGo(tokens, line);
                 break;
             case "stop":
                 break;
@@ -110,11 +103,15 @@ private:
             case "fen":
                 writefln("%s", game.pos.getFEN());
                 break;
+            case "s":
+                Move m = game.findBestMove();
+                writefln("best move: %s", m);
+                break;
             default: 
                 // Assume this is an algebraic move eg. a2a4
                 Move move = Move.fromAlgebraic(command);
-                auto gen = new MailboxMoveGenerator();
-                gen.generate(game.pos);
+                auto gen = new MBMoveGenerator();
+                gen.generate(game.pos, false);
                 move = gen.getMoves().find(move.from(), move.to());
 
                 //move = Move(60, 62, Move.Flag.CASTLE, Move.Flag2.NONE);
@@ -127,6 +124,7 @@ private:
                 }
                 break;
         }
+        uciLogger.close();
     }
 
     Game newGame() {
@@ -147,5 +145,95 @@ private:
         writefln("| Collection time ... %.2f ms", profileStats.totalCollectionTime.total!"nsecs"/1000000.0);
         writefln("| Pause time ........ %.2f ms", profileStats.totalPauseTime.total!"nsecs"/1000000.0);
         writefln("#==========================================#");
+    }
+    /**
+     * setoption name <id> [value <x>]
+     */
+    void handleSetoption(string[] tokens, string line) {
+        writefln("set option ignored: %s", line);
+    }
+    /**
+     * position [fen <fenstring> | startpos ]  moves <move1> .... <movei>
+     *
+     *
+     */
+    void handlePosition(string[] tokens, string line) {
+        string sub = tokens.length > 1 ? tokens[1] : "";
+        auto movesPos = line.indexOf("moves"); 
+        string[] moves = movesPos == -1 ? null : line[movesPos+5..$].split();
+        FEN fen;
+        if("fen" == sub) {
+            auto fenPos = line.indexOf("fen") + 4;
+            string fenStr = line[fenPos..maxOf(movesPos, line.length)];
+            fen = new FEN(fenStr);
+        } else if("startpos" == sub) {
+            fen = FEN.START_POSITION;
+        }
+
+        MBPosition pos = createMailboxPosition(fen);
+
+        foreach(s; moves) {
+            Move move = Move.fromAlgebraic(s);
+            if(move == NO_MOVE) {
+                uciWriteDebugLine("invalid move: %s", s);
+            } else {
+                uciWriteDebugLine("applying move %s", move);
+                pos.makeMove(move);
+            }
+        }
+        uciWriteDebugLine("setting position to %s", pos.getFEN());
+        game.setPosition(pos);
+    }
+    /**
+     * ucinewgame
+     */
+    void handleUcinewgame(string[] tokens, string line) {
+        this.game = new Game(FEN.START_POSITION);
+        uciWriteDebugLine("starting new game");
+    }
+    /**
+     * eg.
+     *  go wtime 300000 btime 300000 movestogo 40
+     *  go infinite
+     */
+    void handleGo(string[] tokens, string line) {
+        assert(tokens[0] == "go");
+        assert(tokens.length > 1);
+        import std.conv : to;
+
+        int i = 1;
+        while(i < tokens.length) {
+            string command = tokens[i++];
+
+            switch(command) {
+                case "infinite":
+                    game.whiteTimeMs = ulong.max;
+                    game.blackTimeMs = ulong.max;
+                    uciWriteDebugLine("setting white time to %s ms", game.whiteTimeMs);
+                    uciWriteDebugLine("setting black time to %s ms", game.blackTimeMs);
+                    break;
+                case "wtime":
+                    game.whiteTimeMs = to!ulong(tokens[i++]);
+                    uciWriteDebugLine("setting white time to %s ms", game.whiteTimeMs);
+                    break;
+                case "btime":
+                    game.blackTimeMs = to!ulong(tokens[i++]);
+                    uciWriteDebugLine("setting black time to %s ms", game.blackTimeMs);
+                    break;
+                case "movestogo":
+                    uciWriteDebugLine("setting moves to go to %s", tokens[i++]);
+                    break;    
+                default: 
+                    uciWriteDebugLine("todo handle go command '%s'", tokens[1]); 
+                    return;
+            }
+        }
+
+        uciWriteDebugLine("Searching...");
+        // start searching and then return the best move
+        game.asyncFindBestMove((move) {
+            // todo - write info
+            uciWriteLine("bestmove %s", move);
+        });
     }
 }

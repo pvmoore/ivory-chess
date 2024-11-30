@@ -1,4 +1,4 @@
-module ivory.Move;
+module ivory.move.Move;
 
 import ivory.all;
 
@@ -29,7 +29,7 @@ public:
         data |= (from).as!ushort;
         data |= (to<<6).as!ushort;
     }
-    this(square from, square to, Flag flag = Flag.NONE) {
+    this(square from, square to, Flag flag) {
         data |= (from).as!ushort;
         data |= (to<<6).as!ushort;
         data |= (flag<<12).as!ushort;
@@ -44,7 +44,7 @@ public:
         if(f1 > 7 || r1 > 7) return NO_MOVE;
 
         uint i = 2;
-        if(s[i]=='x') {
+        if(s[i] == 'x') {
             i++;
             flag = Flag.CAPTURE;
         }
@@ -53,8 +53,8 @@ public:
         uint r2 = s[i++] - '1';
         if(f2 > 7 || r2 > 7) return NO_MOVE;
 
-        square from = f1 + r1*8;
-        square to = f2 + r2*8;
+        square from = f1 + r1 * 8;
+        square to   = f2 + r2 * 8;
 
         if(i < s.length-1) {
             switch(s[i]) {
@@ -72,6 +72,7 @@ public:
     square to() { return (data >>> 6) & 0b111111; }
     bool isCastle() { return flag() == Flag.CASTLE; }
     bool isEnPassantCapture() { return flag() == Flag.ENPASSANT_CAPTURE; }
+    bool isSpecial() { return flag() != Flag.NONE; }
     bool isPromotion() {
         Flag f = flag();
         return f==Flag.PROMOTE_BISHOP ||
@@ -81,8 +82,8 @@ public:
     }
     Piece promotionPiece() { 
         Flag f = flag();
-        return f==Flag.PROMOTE_QUEEN ? Piece.QUEEN :
-               f==Flag.PROMOTE_ROOK ? Piece.ROOK :
+        return f==Flag.PROMOTE_QUEEN  ? Piece.QUEEN :
+               f==Flag.PROMOTE_ROOK   ? Piece.ROOK :
                f==Flag.PROMOTE_KNIGHT ? Piece.KNIGHT :
                f==Flag.PROMOTE_BISHOP ? Piece.BISHOP : Piece.NONE;
     }
@@ -92,7 +93,7 @@ public:
     string toString() {
         if(from==0 && to==0) return "NO_MOVE";
         string c = isCapture() ? "x" : "";
-        string p = isPromotion() ? ""~fenChar(promotionPiece(), Side.BLACK) : "";
+        string p = isPromotion() ? "" ~ fenChar(promotionPiece(), Side.BLACK) : "";
         string s = "%s%s%s%s%s%s".format(fileChar(from()), rankChar(from()), c, 
                                          fileChar(to()), rankChar(to()), p);
         return s;
@@ -100,7 +101,7 @@ public:
 private:
     ushort data;
 
-    bool isCapture() { return flag() == Flag.CAPTURE; }
+    bool isCapture() { return flag() == Flag.CAPTURE || flag() == Flag.ENPASSANT_CAPTURE; }
 
     Flag flag() { return ((data >>> 12) & 0b111).as!Flag; }
 }

@@ -1,4 +1,4 @@
-module ivory.Side;
+module ivory.board.Side;
 
 import ivory.all;
 

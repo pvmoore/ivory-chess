@@ -1,4 +1,4 @@
-module ivory.mailbox.MailboxMakeMove;
+module ivory.mailbox.MBMakeMove;
 
 import ivory.all;
 
@@ -40,10 +40,11 @@ void makeMoveOnBoardOnly(ref byteboard board, Move m, Side side) {
     }
 }
 
-void makeMove(MailboxPosition pos, Move m) {
+void makeMove(MBPosition pos, Move m) {
     square from = m.from();
     square to = m.to();
     Side side = pos.state.sideToMove;
+    Side enemy = side.opposite();
     Piece movePiece = pos.pieceAt(from);
     assert(movePiece != Piece.NONE);
 
@@ -51,42 +52,62 @@ void makeMove(MailboxPosition pos, Move m) {
     Piece capture = m.isEnPassantCapture() ? Piece.PAWN : pos.pieceAt(to);
 
     // Store history
-    MailboxPosition.History history = {
+    MBPosition.History history = {
         halfMoveClock: pos.state.halfMoveClock,
-        castingPermissions: pos.state.castlingPermissions,
+        castlingPermissions: pos.state.castlingPermissions,
         enPassantTargetSquare: pos.state.enPassantTargetSquare,
         capture: capture,
-        move: m
+        move: m,
+        hash: pos.opt.hash
     };
     pos.history.push(history);
 
-    // Update castling permissions based on the to and from squares
-    pos.state.castlingPermissions &= FROM_SQ_CASTLE_MASKS[from];
-    pos.state.castlingPermissions &= FROM_SQ_CASTLE_MASKS[to];
+    // Update castle permissions
+    if(pos.state.castlingPermissions) {
+        // Unhash castle permissions
+        pos.opt.hash ^= HASH_CASTLE_PERMS[pos.state.castlingPermissions]; 
+
+        // Update castling permissions based on the to and from squares
+        pos.state.castlingPermissions &= SQ_CASTLE_MASKS[from];
+        pos.state.castlingPermissions &= SQ_CASTLE_MASKS[to];
+
+        // Hash new castle permissions
+        pos.opt.hash ^= HASH_CASTLE_PERMS[pos.state.castlingPermissions]; 
+    }
 
     // Remove en passant target (may be added back later if this is a pawn move)
-    pos.state.enPassantTargetSquare = NO_SQUARE;
+    if(pos.state.enPassantTargetSquare != NO_SQUARE) {
+        pos.opt.hash ^= HASH_EN_PASSANT_FILE[file(pos.state.enPassantTargetSquare)];
+        pos.state.enPassantTargetSquare = NO_SQUARE;
+    }
 
     // Update the half move clock
     pos.state.halfMoveClock = (capture == Piece.NONE && movePiece != Piece.PAWN) ? pos.state.halfMoveClock + 1 : 0;
 
+    // Update material
+    pos.opt.material[enemy.as!uint] -= material(capture);
+
     // Move the piece
-    pos.movePiece(from, to);
+    pos.movePiece(from, to, true);
 
     if(movePiece == Piece.PAWN) {
         if(m.isPromotion()) {
-            pos.set(to, m.promotionPiece(), side);
+            pos.set(to, m.promotionPiece(), side, true);
+
+            // Update material
+            pos.opt.material[side.as!uint] += (material(m.promotionPiece()) - 100);
         }
 
         // Remove the captured pawn if this is an enpassant capture
         if(m.isEnPassantCapture()) {
             int offset = side == Side.WHITE ? -8 : 8; 
-            pos.setEmpty(to + offset);
+            pos.setEmpty(to + offset, true);
         }
 
         // Enpassant target available?
         if(abs(from-to) == 16) {
             pos.state.enPassantTargetSquare = (from + to) >>> 1;
+            pos.opt.hash ^= HASH_EN_PASSANT_FILE[file(pos.state.enPassantTargetSquare)];
         } 
 
     } else if(movePiece == Piece.KING) {
@@ -95,14 +116,25 @@ void makeMove(MailboxPosition pos, Move m) {
             bool queenSide = from > to;
             square rookFrom = queenSide ? from - 4 : from + 3;
             square rookTo   = queenSide ? from - 1 : from + 1;
-            pos.movePiece(rookFrom, rookTo);
+            pos.movePiece(rookFrom, rookTo, true);
         }
         // Update king position cache
         pos.setKingSquare(to, side); 
     }
 
-    pos.state.sideToMove = side.opposite();
+    // Update endgame percentage
+    uint numWhitePieces = popcnt(pos.opt.pieces[0]);
+    uint numBlackPieces = popcnt(pos.opt.pieces[1]); 
+    pos.opt.endgame = getEndgamePercentage(numWhitePieces, numBlackPieces);
+
     pos.state.fullMoveNumber += (side == Side.WHITE ? 1 : 0);
+    
+    // Update side to move
+    {
+        pos.opt.hash ^= HASH_SIDE_TO_MOVE[pos.state.sideToMove.as!uint];
+        pos.state.sideToMove = side.opposite();
+        pos.opt.hash ^= HASH_SIDE_TO_MOVE[pos.state.sideToMove.as!uint];
+    }
 }
 /*
 // This appears to be slower than just copying the board and then throwing it away
@@ -139,32 +171,15 @@ void unmakeMoveBoardOnly(ref boardtype board, Move m, Side side, ubyte toSqValue
 }
 */
 
-// struct State {
-//     uint halfMoveClock;
-//     uint fullMoveNumber;
-//     uint castlingPermissions;
-//     square enPassantTargetSquare;
-//     Side sideToMove;
-//     boardtype board;
-//     // Optimisation
-//     square whiteKingSquare;
-//     square blackKingSquare;
-// }
-// MailboxPosition.History history = {
-//         halfMoveClock: state.halfMoveClock,
-//         castingPermissions: state.castlingPermissions,
-//         enPassantTargetSquare: state.enPassantTargetSquare,
-//         capture: capture,
-//         move: m
-// };
-void unmakeMove(MailboxPosition pos) {
+void unmakeMove(MBPosition pos) {
     auto history = pos.history.pop();
 
     pos.state.halfMoveClock = history.halfMoveClock;
     pos.state.fullMoveNumber -= (pos.state.sideToMove == Side.WHITE) ? 1 : 0;
-    pos.state.castlingPermissions = history.castingPermissions;
+    pos.state.castlingPermissions = history.castlingPermissions;
     pos.state.enPassantTargetSquare = history.enPassantTargetSquare;
     pos.state.sideToMove = pos.state.sideToMove.opposite();
+    pos.opt.hash = history.hash;
     
     Side side = pos.state.sideToMove;
     Side enemy = side.opposite();
@@ -174,25 +189,39 @@ void unmakeMove(MailboxPosition pos) {
 
     square from = m.from();
     square to = m.to();
-    Piece movePiece = m.isPromotion() ? Piece.PAWN : pos.pieceAt(to);
+    Piece promotionPiece = Piece.NONE;
+    Piece movePiece;
+    if(m.isPromotion()) {
+        movePiece = Piece.PAWN;
+        promotionPiece = pos.pieceAt(to);
+    } else {
+        movePiece = pos.pieceAt(to);
+    }
     Piece capture = history.capture;
 
+    // Update material
+    pos.opt.material[enemy.as!uint] += material(capture);
+
     // Apply move in reverse
-    pos.movePiece(to, from);
+    pos.movePiece(to, from, false);
 
     // Put captured piece back if not en-passant
     if(capture != Piece.NONE && !m.isEnPassantCapture()) {
-        pos.set(to, capture, enemy);
+        pos.set(to, capture, enemy, false);
     }
 
     if(movePiece == Piece.PAWN) {
         if(m.isEnPassantCapture()) {
             square sq = (side == Side.WHITE) ? to - 8 : to + 8;
-            pos.set(sq, Piece.PAWN, enemy);
+            pos.set(sq, Piece.PAWN, enemy, false);
 
         } else if(m.isPromotion()) {
             // Replace promotion piece with pawn
-            pos.set(from, Piece.PAWN, side);
+            pos.set(from, Piece.PAWN, side, false);
+
+            // Update material
+            pos.opt.material[side.as!uint] += 100;
+            pos.opt.material[side.as!uint] -= material(promotionPiece);
         } 
     } else if(movePiece == Piece.KING) {
         // Castling - move the rook
@@ -200,10 +229,14 @@ void unmakeMove(MailboxPosition pos) {
             bool queenSide = from > to;
             square rookFrom = queenSide ? from - 1 : from + 1;
             square rookTo = queenSide ? from - 4 : from + 3;
-            pos.movePiece(rookFrom, rookTo);
+            pos.movePiece(rookFrom, rookTo, false);
         } 
 
         // Update king position cache
         pos.setKingSquare(from, side); 
     }
+    // Update endgame percentage
+    uint numWhitePieces = popcnt(pos.opt.pieces[0]);
+    uint numBlackPieces = popcnt(pos.opt.pieces[1]); 
+    pos.opt.endgame = getEndgamePercentage(numWhitePieces, numBlackPieces);
 }

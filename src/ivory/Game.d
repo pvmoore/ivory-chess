@@ -4,30 +4,38 @@ import ivory.all;
 
 final class Game {
 public:
-    MailboxPosition pos;
+    MBPosition pos;
     int ply;
+    ulong whiteTimeMs;
+    ulong blackTimeMs;
 
     this(FEN fen) {
-        this.startPosition = fen;
-
         restart();
     }
     void restart() {
-        ply = 0;
-        pos = new MailboxPosition();
-        pos.fromFEN(startPosition);
-        moveGen = new MailboxMoveGenerator();
+        this.ply = 0;
+        this.pos = createMailboxPosition(FEN.START_POSITION);
     }
-    void setPosition(FEN fen) {
-        // if fen == current FEN then ignore otherwise change the current pos
-
-        FEN current = pos.getFEN();
-
-        // Note that the opponent's move should now be applied and we can start searching 
-
+    void setPosition(Position pos) {
+        this.pos = pos.as!MBPosition;
+    }
+    Move findBestMove() {
+        auto search = new Search(new MBMoveGenerator(), new MBEvaluator());
+        return search.getBestMove(pos, pos.state.sideToMove == Side.WHITE ? whiteTimeMs : blackTimeMs);
+    }
+    void asyncFindBestMove(void delegate(Move) andThen) {
+        auto search = new Search(new MBMoveGenerator(), new MBEvaluator());
+        Move move = search.asyncGetBestMove(pos, pos.state.sideToMove == Side.WHITE ? whiteTimeMs : blackTimeMs);
+        andThen(move);
     }
     void makeMove(Move m) {
         assert(isLegalMove(m));
+
+        if(pos.isRepeatMove(m)) {
+            uciWriteDebugLine("!! repeat move");
+        } 
+
+        uciWriteDebugLine("making move %s", m);
 
         ply++;
         pos.makeMove(m);
@@ -39,12 +47,10 @@ public:
         pos.unmakeMove();
     }
     bool isLegalMove(Move m) {
-        auto gen = new MailboxMoveGenerator();
-        gen.generate(pos);
+        auto gen = new MBMoveGenerator();
+        gen.generate(pos, false);
         auto legalMoves = gen.getMoves();
         return legalMoves.contains(m);
     }
 private:
-    FEN startPosition;
-    MailboxMoveGenerator moveGen;
 }

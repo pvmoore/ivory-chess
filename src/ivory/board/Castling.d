@@ -1,4 +1,4 @@
-module ivory.Castling;
+module ivory.board.Castling;
 
 import ivory.all;
 
@@ -30,7 +30,7 @@ __gshared {
     private enum BKS = 0b1011;
     private enum BQS = 0b0111;
 
-    immutable(uint)[] FROM_SQ_CASTLE_MASKS = [
+    immutable(uint)[] SQ_CASTLE_MASKS = [
       // Note: These squares go from 0 to 63 ie the ranks are the opposite of the standard board layout
 
         WQS, Z, Z, Z, W, Z, Z, WKS,

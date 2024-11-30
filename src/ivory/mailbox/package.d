@@ -4,11 +4,14 @@ import ivory.all;
 
 public:
 
-import ivory.mailbox.MailboxAttacks;
-import ivory.mailbox.MailboxEnprise;
-import ivory.mailbox.MailboxMakeMove;
-import ivory.mailbox.MailboxPosition;
-import ivory.mailbox.MailboxMoveGenerator;
+import ivory.mailbox.MBAttacks;
+import ivory.mailbox.MBEnprise;
+import ivory.mailbox.MBEvalutor;
+import ivory.mailbox.MBMakeMove;
+import ivory.mailbox.MBMoveGenerator;
+import ivory.mailbox.MBPosition;
+import ivory.mailbox.MBPositionBuilder;
+import ivory.mailbox.MBValidator;
 
 immutable(square)[] knightMoves(square sq) { 
     assert(sq >= 0 && sq < 64);

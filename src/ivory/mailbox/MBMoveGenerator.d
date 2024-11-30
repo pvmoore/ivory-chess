@@ -1,4 +1,4 @@
-module ivory.mailbox.MailboxMoveGenerator;
+module ivory.mailbox.MBMoveGenerator;
 
 import ivory.all;
 
@@ -20,7 +20,7 @@ import ivory.all;
  *       0  1  2  3  4  5  6  7
  *               file
  */
-final class MailboxMoveGenerator {
+final class MBMoveGenerator : MoveGenerator {
 public:
     MoveList getMoves() { return moves; }
 
@@ -28,27 +28,34 @@ public:
         this.moves = new MoveList();
     }
     /** Generate moves for position and return the number of moves generated */
-    uint generate(MailboxPosition pos) {
-        this.pos = pos;
+    override uint generate(Position p, bool capturesOnly) {
+        this.pos = p.as!MBPosition;
         this.side = pos.state.sideToMove;
         this.enemy = side.opposite();
         this.numMoves = 0;
 
-        foreach(i; 0..64.as!square) {
-            if(pos.isEmpty(i)) continue;
-            Piece sqPiece = pos.pieceAt(i);
-            if(pos.sideAt(i) == side) {
-                generateForSquare(i, sqPiece);
-            }
+        bitboard bb = pos.opt.pieces[side.as!uint];
+        uint numPieces = popcnt(bb);
+
+        foreach(i; 0..numPieces) {
+            square sq = bb.pop();
+            generateForSquare(sq, pos.pieceAt(sq));
         }
+
         return numMoves;
     }
-    Move popMove() {
+    override Move popMove() {
         return moves.pop();
+    }
+    override void discardMoves(uint num) {
+        moves.discard(num);
+    }
+    override uint getNumMoves() {
+        return moves.length();
     }
 private:
     MoveList moves;
-    MailboxPosition pos;
+    MBPosition pos;
     Side side;
     Side enemy;
     uint numMoves;

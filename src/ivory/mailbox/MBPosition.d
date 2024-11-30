@@ -1,8 +1,8 @@
-module ivory.mailbox.MailboxPosition;
+module ivory.mailbox.MBPosition;
 
 import ivory.all;
 
-final class MailboxPosition {
+final class MBPosition : Position {
 public:
     struct State {
         byteboard board;
@@ -11,53 +11,99 @@ public:
         uint castlingPermissions;
         square enPassantTargetSquare;
         Side sideToMove;
-        // Optimisation
-        square whiteKingSquare;
-        square blackKingSquare;
+    }
+    struct Optimisation {
+        square[2] kingSquare;
+        uint[2] material;
+        bitboard[2] pieces;
+        float endgame;          // 0.0 start position -> 1.0 end game
+        uint hash;
     }
     struct History {
         uint halfMoveClock;
-        uint castingPermissions;
+        uint castlingPermissions;
         square enPassantTargetSquare;
         Piece capture;
         Move move; 
+        uint hash;
     }
 
     State state;
-    stack!(History,MAX_MOVES) history;
+    Optimisation opt;
+    Stack!(History,MAX_PLY) history;
 
-    void fromFEN(FEN fen) {
-        this.state.sideToMove = fen.sideToMove;
-        this.state.fullMoveNumber = fen.fullMoveNumber;
-        this.state.halfMoveClock = fen.halfMoveClock;
-        this.state.enPassantTargetSquare = fen.enPassantTargetSquare;
-        this.state.castlingPermissions = fen.castlingPermissions;
-        this.state.board = fen.board; 
-
-        foreach(i; 0..64.as!square) {
-            if(pieceAt(i) == Piece.KING) {
-                if(sideAt(i) == Side.WHITE) {
-                    this.state.whiteKingSquare = i;
-                } else {
-                    this.state.blackKingSquare = i;
-                }
-            }
-        }
+    override uint key() {
+        return opt.hash;
+    }
+    override void makeMove(Move m) {
+        return .makeMove(this, m);
+    }
+    override void unmakeMove() {
+        .unmakeMove(this);
     }
     FEN getFEN() {
         return new FEN(state.board, state.sideToMove, state.castlingPermissions, state.enPassantTargetSquare, state.halfMoveClock, state.fullMoveNumber);
     }
+    /** Check through move history */
+    bool isRepeatMove(Move m) {
+        bool isRepeat = false;
+        history.iterateWhile((ref h) {
+            if(h.move == m) {
+                isRepeat = true;
+                return false;
+            }
+            if(h.halfMoveClock == 0) {
+                // if the half move clock was reset then this cannot be a repeat 
+                return false;
+            }
+            return true;
+        });
+        return isRepeat;
+    }
+
+    // Board update functions
+    //──────────────────────────────────────────────────────────────────────────────────────────────────
+    void set(square sq, Piece piece, Side side, bool updateHash) {
+        if(updateHash) {
+            if(uint b = state.board[sq]) {
+                opt.hash ^= HASH_BOARD[sq*16 + b];
+            }
+            opt.hash ^= HASH_BOARD[sq*16 + (piece | side<<3).as!uint];
+        }
+        state.board.set(sq, piece, side);
+        opt.pieces[side.as!uint].set(sq);
+    }
+    void setEmpty(square sq, bool updateHash) {
+        if(updateHash) {
+            if(uint b = state.board[sq]) {
+                opt.hash ^= HASH_BOARD[sq*16 + b];
+            }
+        }
+        state.board.setEmpty(sq);
+        opt.pieces[0].unset(sq);
+        opt.pieces[1].unset(sq);
+    }
+    void movePiece(square from, square to, bool updateHash) {
+        if(updateHash) {
+            uint f = state.board[from];
+            uint t = state.board[to];
+            assert(f != 0);
+
+            opt.hash ^= HASH_BOARD[from*16 + f];
+            if(t != 0) {
+                opt.hash ^= HASH_BOARD[to*16 + t];
+            }
+            opt.hash ^= HASH_BOARD[to*16 + f];
+        }
+        state.board.move(from, to);
+        opt.pieces[0].move(from, to);
+        opt.pieces[1].move(from, to);
+    }
+
+    // Board query functions
+    //──────────────────────────────────────────────────────────────────────────────────────────────────
     uint get(square sq) {
         return state.board.get(sq);
-    }
-    void set(square sq, Piece piece, Side side) {
-        state.board.set(sq, piece, side);
-    }
-    void setEmpty(square sq) {
-        state.board.setEmpty(sq);
-    }
-    void movePiece(square from, square to) {
-        state.board.move(from, to);
     }
     bool isEmpty(square sq) {
         return state.board.get(sq) == 0;
@@ -78,14 +124,10 @@ public:
         return .squareIsAttacked(state.board, sq, bySide);
     }
     square kingSquare(Side side) {
-        return side == Side.WHITE ? state.whiteKingSquare : state.blackKingSquare;
+        return opt.kingSquare[side.as!uint];
     }
     void setKingSquare(square sq, Side side) {
-        if(side == Side.WHITE) {
-            state.whiteKingSquare = sq;
-        } else {
-            state.blackKingSquare = sq;
-        }
+        opt.kingSquare[side.as!uint] = sq;
     }
     bool canCastleKingSide() {
         return .canCastleKingSide(state.castlingPermissions, state.sideToMove);
@@ -142,13 +184,17 @@ public:
         buf ~= "HMClock: %s, ".format(state.halfMoveClock);
 
         // Full move number
-        buf ~= "Move: %s ".format(state.fullMoveNumber);
+        buf ~= "Move: %s, ".format(state.fullMoveNumber);
 
         // Material
-        //buf ~= "Material: %s ".format(whiteMaterial-blackMaterial);
+        buf ~= "Material: %s, ".format(opt.material);
 
-        // Num pieces
-        //buf ~= "Pieces: %s ".format(whiteNumPieces-blackNumPieces);
+        // Endgame
+        buf ~= "Endgame: %.2f".format(opt.endgame);
+
+        // buf ~= "\nWhite: %064b".format(opt.pieces[0]);
+        // buf ~= "\nBlack: %064b".format(opt.pieces[1]);
+
 
         buf ~= "\n";
 
