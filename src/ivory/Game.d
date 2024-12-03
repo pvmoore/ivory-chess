@@ -10,11 +10,12 @@ public:
     ulong blackTimeMs;
 
     this(FEN fen) {
-        restart();
+        restart(fen);
     }
-    void restart() {
+    void restart(FEN fen = null) {
+        if(fen is null) fen = FEN.startPosition();
         this.ply = 0;
-        this.pos = createMailboxPosition(FEN.START_POSITION);
+        this.pos = createMailboxPosition(fen);
     }
     void setPosition(Position pos) {
         this.pos = pos.as!MBPosition;

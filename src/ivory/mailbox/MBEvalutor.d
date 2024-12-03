@@ -4,34 +4,58 @@ import ivory.all;
 
 final class MBEvaluator : Evaluator {
 public:
+    bool chatty = false;
+
     /** 
      * Evaluate the position from the side to move's point of view. 
      */
     override int evaluate(Position p) {
         MBPosition pos = p.as!MBPosition;
 
-        uint score = evaluateMaterial(pos);
+        startChat(pos);
+
+        int score = evaluateMaterial(pos);
         score += evaluateControl(pos);
 
-        // Invert the score if it is BLACK's move
-        if(pos.state.sideToMove == Side.BLACK) {
-            score = -score;
-        }
+        chat("Total %s", score);
 
+        endChat();
         return score;
     }
 private:
-    /** Return material total from WHITE's point of view */
-    int evaluateMaterial(MBPosition pos) {
-        return pos.opt.material[0] - pos.opt.material[1];
+    void startChat(MBPosition pos) {
+        //chatty = pos.history.contains(h=>h.hash == 10751324940445322172);
+        if(!chatty) return;
+        writefln("Eval (%s) { %s", pos.state.sideToMove, pos.history.map!(it=>it.move).array.reverse);
     }
-    /** Return scquare control from WHITE's point of view */
+    void endChat() {
+        if(!chatty) return;
+        writefln("}");
+    }
+    void chat(A...)(string fmt, A args) {
+        if(!chatty) return;
+        writefln("  %s", format(fmt, args));
+    }
+    int evaluateMaterial(MBPosition pos) {
+        int score = pos.opt.material[0] - pos.opt.material[1];
+        if(pos.state.sideToMove == Side.BLACK) {
+            score = -score;
+        } 
+        chat("material %s", score);
+        return score;
+    }
     int evaluateControl(MBPosition pos) {
         
-        bitboard bb = pos.opt.pieces[0] | pos.opt.pieces[1];
+        bitboard bb = pos.opt.pieces[pos.state.sideToMove.as!uint];
         uint numPieces = popcnt(bb);
         bool mirror = pos.state.sideToMove == Side.BLACK;
-        int score = 0;
+
+        int pawnScore = 0;
+        int knightScore = 0;
+        int bishopScore = 0;
+        int rookScore = 0;
+        int queenScore = 0;
+        int kingScore = 0;
 
         foreach(i; 0..numPieces) {
             square sq = bb.pop();
@@ -42,15 +66,19 @@ private:
             }
             final switch(piece) with(Piece) {
                 case NONE: throwIf(true, "We should not get here"); break;
-                case PAWN: score += getPawnControlValue(sq, pos.opt.endgame); break; 
-                case BISHOP: score += getBishopControlValue(sq); break;
-                case KNIGHT: score += getKnightControlValue(sq); break;
-                case ROOK: score += getRookControlValue(sq); break; 
-                case QUEEN: score += getQueenControlValue(sq); break; 
-                case KING: score += getKingControlValue(sq, pos.opt.endgame); break; 
+                case PAWN: pawnScore += getPawnControlValue(sq, pos.opt.endgame); break; 
+                case BISHOP: bishopScore += getBishopControlValue(sq); break;
+                case KNIGHT: knightScore += getKnightControlValue(sq); break;
+                case ROOK: rookScore += getRookControlValue(sq); break; 
+                case QUEEN: queenScore += getQueenControlValue(sq); break; 
+                case KING: kingScore += getKingControlValue(sq, pos.opt.endgame); break; 
             }
         }
-        return score;
+        if(chatty) {
+            chat("Control: pawn: %s, bishop: %s, knight: %s, rook: %s, queen: %s, king: %s", 
+                pawnScore, bishopScore, knightScore, rookScore, queenScore, kingScore);
+        }
+        return pawnScore + bishopScore + knightScore + rookScore + queenScore + kingScore;
     }
 
     int getPawnControlValue(square sq, float endGame) {
@@ -122,14 +150,14 @@ private:
     ];
 
     immutable(int)[] KNIGHT_POSITIONS = [
-        /* 8 */	-50, -40, -30, -30, -30, -30, -40, -50,
-        /* 7 */	-40, -20,   0,   0,   0,   0, -20, -40,
-        /* 6 */	-30,   0,  10,  15,  15,  10,   0, -30,
-        /* 5 */	-30,   0,  15,  20,  20,  15,   0, -30,
-        /* 4 */	-30,   0,  15,  20,  20,  15,   0, -30,
-        /* 3 */	-30,   0,  10,  15,  15,  10,   0, -30,
-        /* 2 */	-40, -20,   0,  10,  10,   0, -20, -40,
-        /* 1 */	-50, -40, -30, -30, -30, -30, -40, -50
+        /* 8 */	-30, -20, -20, -20, -20, -20, -20, -30,
+        /* 7 */	-20, -10,   0,   0,   0,   0, -10, -20,
+        /* 6 */	-20,   0,  10,  15,  15,  10,   0, -20,
+        /* 5 */	-20,   0,  15,  20,  20,  15,   0, -20,
+        /* 4 */	-20,   0,  15,  20,  20,  15,   0, -20,
+        /* 3 */	-20,   0,  10,  15,  15,  10,   0, -20,
+        /* 2 */	-20, -10,   0,  10,  10,   0, -10, -20,
+        /* 1 */	-30, -20, -20, -20, -20, -20, -20, -30
         /*        a    b    c    d    e    f    g    h */
     ];
     immutable(int)[] BISHOP_POSITIONS = [

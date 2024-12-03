@@ -34,14 +34,13 @@ MBPosition createMailboxPosition(FEN fen) {
 }
 
 __gshared {
-    // todo - Check cache key collisions
-    uint[] HASH_BOARD;
-    uint[] HASH_EN_PASSANT_FILE;
-    uint[] HASH_CASTLE_PERMS;
-    uint[] HASH_SIDE_TO_MOVE;
+    ulong[] HASH_BOARD;
+    ulong[] HASH_EN_PASSANT_FILE;
+    ulong[] HASH_CASTLE_PERMS;
+    ulong[] HASH_SIDE_TO_MOVE;
     bool hashInitialised;
 }
-uint generateHash(MBPosition pos) {
+ulong generateHash(MBPosition pos) {
     // Initial the global hash on first use
     if(cas(&hashInitialised, false, true)) {
         HASH_BOARD.length = 64 * 16;
@@ -50,24 +49,24 @@ uint generateHash(MBPosition pos) {
         HASH_SIDE_TO_MOVE.length = 2;
 
         foreach(i; 0..HASH_BOARD.length) {
-            HASH_BOARD[i] = uniform(0, uint.max);
+            HASH_BOARD[i] = randomUlong();
         }
         foreach(i; 0..HASH_EN_PASSANT_FILE.length) {
-            HASH_EN_PASSANT_FILE[i] = uniform(0, uint.max);
+            HASH_EN_PASSANT_FILE[i] = randomUlong();
         }
         foreach(i; 0..HASH_CASTLE_PERMS.length) {
-            HASH_CASTLE_PERMS[i] = uniform(0, uint.max);
+            HASH_CASTLE_PERMS[i] = randomUlong();
         }
         foreach(i; 0..HASH_SIDE_TO_MOVE.length) {
-            HASH_SIDE_TO_MOVE[i] = uniform(0, uint.max);
+            HASH_SIDE_TO_MOVE[i] = randomUlong();
         }
     }
 
-    uint h;
+    ulong h;
 
     // Hash the board
     foreach(i; 0..64) {
-        uint b = pos.state.board[i];
+        ulong b = pos.state.board[i];
         if(b != 0) {
             h ^= HASH_BOARD[i*16 + b];
         }

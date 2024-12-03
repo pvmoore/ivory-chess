@@ -88,11 +88,11 @@ void makeMove(MBPosition pos, Move m) {
     pos.opt.material[enemy.as!uint] -= material(capture);
 
     // Move the piece
-    pos.movePiece(from, to, true);
+    pos.movePiece!true(from, to);
 
     if(movePiece == Piece.PAWN) {
         if(m.isPromotion()) {
-            pos.set(to, m.promotionPiece(), side, true);
+            pos.set!true(to, m.promotionPiece(), side);
 
             // Update material
             pos.opt.material[side.as!uint] += (material(m.promotionPiece()) - 100);
@@ -101,7 +101,7 @@ void makeMove(MBPosition pos, Move m) {
         // Remove the captured pawn if this is an enpassant capture
         if(m.isEnPassantCapture()) {
             int offset = side == Side.WHITE ? -8 : 8; 
-            pos.setEmpty(to + offset, true);
+            pos.setEmpty!true(to + offset);
         }
 
         // Enpassant target available?
@@ -116,7 +116,7 @@ void makeMove(MBPosition pos, Move m) {
             bool queenSide = from > to;
             square rookFrom = queenSide ? from - 4 : from + 3;
             square rookTo   = queenSide ? from - 1 : from + 1;
-            pos.movePiece(rookFrom, rookTo, true);
+            pos.movePiece!true(rookFrom, rookTo);
         }
         // Update king position cache
         pos.setKingSquare(to, side); 
@@ -203,21 +203,21 @@ void unmakeMove(MBPosition pos) {
     pos.opt.material[enemy.as!uint] += material(capture);
 
     // Apply move in reverse
-    pos.movePiece(to, from, false);
+    pos.movePiece!false(to, from);
 
     // Put captured piece back if not en-passant
     if(capture != Piece.NONE && !m.isEnPassantCapture()) {
-        pos.set(to, capture, enemy, false);
+        pos.set!false(to, capture, enemy);
     }
 
     if(movePiece == Piece.PAWN) {
         if(m.isEnPassantCapture()) {
             square sq = (side == Side.WHITE) ? to - 8 : to + 8;
-            pos.set(sq, Piece.PAWN, enemy, false);
+            pos.set!false(sq, Piece.PAWN, enemy);
 
         } else if(m.isPromotion()) {
             // Replace promotion piece with pawn
-            pos.set(from, Piece.PAWN, side, false);
+            pos.set!false(from, Piece.PAWN, side);
 
             // Update material
             pos.opt.material[side.as!uint] += 100;
@@ -229,7 +229,7 @@ void unmakeMove(MBPosition pos) {
             bool queenSide = from > to;
             square rookFrom = queenSide ? from - 1 : from + 1;
             square rookTo = queenSide ? from - 4 : from + 3;
-            pos.movePiece(rookFrom, rookTo, false);
+            pos.movePiece!false(rookFrom, rookTo);
         } 
 
         // Update king position cache

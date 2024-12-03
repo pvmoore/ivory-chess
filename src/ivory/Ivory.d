@@ -30,15 +30,6 @@ private:
     Game game;
     bool running = true;
 
-    /** 
-    go wtime 300000 btime 300000 movestogo 40
-        bestmove d2d4 ponder d7d5
-
-    position startpos moves d2d4
-    isready
-        readyok    
-     */
-
     void handleCommand(string command, string line, string[] tokens) {
         switch(command) {
             // ###############################################################################
@@ -73,7 +64,7 @@ private:
                 break;
 
             // ###############################################################################
-            // Internal commands		
+            // Internal testing commands		
             // ###############################################################################
             case "perft": 
                 testPerft();
@@ -81,6 +72,14 @@ private:
             case "boards":
                 testBoards();
                 break;
+            case "test":
+                game = new Game(new FEN("rnbqkb1r/pppppppp/5n2/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 3"));
+                writefln("testing %s", game.pos.getFEN());
+                break;
+
+            // ###############################################################################
+            // Other internal commands		
+            // ###############################################################################                    
             case "q":
                 displayGCStats();
                 running = false;
@@ -128,7 +127,7 @@ private:
     }
 
     Game newGame() {
-        return new Game(FEN.START_POSITION);
+        return new Game(FEN.startPosition());
     }
     void displayGameState(Game game) {
         writefln(game.pos.toString());
@@ -154,8 +153,6 @@ private:
     }
     /**
      * position [fen <fenstring> | startpos ]  moves <move1> .... <movei>
-     *
-     *
      */
     void handlePosition(string[] tokens, string line) {
         string sub = tokens.length > 1 ? tokens[1] : "";
@@ -164,10 +161,10 @@ private:
         FEN fen;
         if("fen" == sub) {
             auto fenPos = line.indexOf("fen") + 4;
-            string fenStr = line[fenPos..maxOf(movesPos, line.length)];
+            string fenStr = line[fenPos..maxOf!long(movesPos, line.length)];
             fen = new FEN(fenStr);
         } else if("startpos" == sub) {
-            fen = FEN.START_POSITION;
+            fen = FEN.startPosition();
         }
 
         MBPosition pos = createMailboxPosition(fen);
@@ -188,7 +185,7 @@ private:
      * ucinewgame
      */
     void handleUcinewgame(string[] tokens, string line) {
-        this.game = new Game(FEN.START_POSITION);
+        this.game = new Game(FEN.startPosition());
         uciWriteDebugLine("starting new game");
     }
     /**

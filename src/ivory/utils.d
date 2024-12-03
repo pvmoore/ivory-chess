@@ -20,6 +20,24 @@ public:
             if(!fn(array[i])) return;
         }
     }
+    bool contains(bool delegate(ref T) fn) {
+        foreach_reverse(i; 0..pos) {
+            if(fn(array[i])) return true;
+        }
+        return false;
+    }
+    J[] collect(J)(J delegate(ref T) fn) {
+        J[] collection;
+        foreach_reverse(i; 0..pos) {
+            collection ~= fn(array[i]);
+        }
+        return collection;
+    }
+
+    // InputRange functions (empty, front, popFront)
+    bool empty() { return pos == 0; }
+    T front() { return array[pos-1]; }
+    void popFront() { pos--; }
 private:
     T[CAP] array;
     int pos;
@@ -50,6 +68,9 @@ T maxOf(T)(T a, T b) {
 }
 T minOf(T)(T a, T b) {
     return a < b ? a : b;
+}
+ulong randomUlong() {
+    return uniform(0, ulong.max, rng);
 }
 
 private import std.stdio    : File, writeln, writefln, write, writef, readln;

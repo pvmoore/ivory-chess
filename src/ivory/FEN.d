@@ -10,7 +10,7 @@ import ivory.all;
  */
 final class FEN {
 public:
-    __gshared static START_POSITION = new FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    static startPosition() { return new FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); }
 
     byteboard board;        // List of (Piece | (Side<<3)) from A1-H1, B1-H2 etc
     Side sideToMove;
@@ -87,6 +87,7 @@ private:
         return fen;
     }
     void parse() {
+        //writefln("Parsing fen '%s'", fenString);
         uint src = 0;
         char ch;
         uint rank = 56;
@@ -134,6 +135,7 @@ private:
         // Side to move
         sideToMove = _consume() == 'w' ? Side.WHITE : Side.BLACK;
         throwIfNot(_consume() == ' ');
+
         
         // Castling permissions
         if(_peek() == 'K') {
@@ -167,10 +169,11 @@ private:
         }
         throwIfNot(_consume() == ' ');
 
+
         // Half move clock
         import std.conv : to;
         string hmc = "";
-        while((ch=_consume()) != ' ') {
+        while((ch=_consume()) > ' ') {
             hmc ~= ch;
         }
         halfMoveClock = hmc.to!uint;
@@ -179,7 +182,7 @@ private:
         string fm = "";
         while(true) {
             char c = _consume();
-            if(c && c!=' ') fm ~= c; else break;
+            if(c && c > ' ') fm ~= c; else break;
         }
         fullMoveNumber = fm.to!uint;
     }

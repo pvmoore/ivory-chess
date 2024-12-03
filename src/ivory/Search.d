@@ -2,15 +2,31 @@ module ivory.Search;
 
 import ivory.all;
 
+/**
+ * todo: Example of what we want to be sending periodically to the GUI:
+ *  - info score cp -36  depth 5 seldepth 13 nodes 3530 time 0 pv h7h6  g5f4  e8g8  e2e4  d7d5  
+ */
+
+// rnbqkb1r/pppppppp/5n2/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 3
+
+/*
+    From start position:
+
+    Max depth = 8:
+        Nodes evaluated ............. 4,203,024
+        PV moves .................... 21,271
+
+ */
+
 final class Search {
 public:
     this(MoveGenerator moveGenerator, Evaluator evaluator) {
         this.evaluator = evaluator;
         this.moveGenerator = moveGenerator;
-        this.principalVariation.length = MAX_PLY;
     }
 
     Move asyncGetBestMove(Position pos, ulong timeMs) {
+        // todo - spawn a thread here
         return getBestMove(pos, timeMs);
     }
 
@@ -19,13 +35,12 @@ public:
         this.timeMs = timeMs;
         this.nodesEvaluated = 0;
         this.quiescingNodesEvaluated = 0;
-        this.maxDepth = 4;
-        this.principalVariation[] = NO_MOVE;
         this.lineScores.clear();
-        this.alphaMoves.clear();
+        this.pvMoves.clear();
 
         StopWatch watch = StopWatch(AutoStart.yes);
         Move bestMove = NO_MOVE;
+        int maxDepth = 8;
 
         // Iterative deepening
         foreach(depth; 2..maxDepth) {
@@ -45,19 +60,27 @@ public:
             foreach(i; 0..numMoves) {
                 Move m = moveGenerator.popMove();
                 pos.makeMove(m);
+
+                ulong posKey = pos.key();
+
                 int score = -alphaBeta(depth, -beta, -alpha);
+
+                // if(score == 15) {
+                //     writefln("!! 15 %s", m);
+                // }
+
                 pos.unmakeMove();
                 writefln("[%s/%s] %s (%s)", i+1, numMoves, m, score);
 
                 if(score > alpha) {
-                    writefln("score > alpha (%s > %s)", score, alpha);
+                    //writefln("score > alpha (%s > %s) %s", score, alpha, m);
                     alpha = score;
                     bestMove = m;
-                    alphaMoves.update(m, ()=>score, (ref int s) { if(score > s) s = score; });
+                    pvMoves[pos.key()] = m;
                 }
 
                 // Update line scores 
-                lineScores[m] ~= LineScore(score, depth);
+                lineScores[m] ~= LineScore(score, depth, posKey);
             }
 
             // We should have used up or discarded all of the generated moves at this point
@@ -73,21 +96,15 @@ public:
         foreach(v; lineScores.byKeyValue()) {
             writefln("%s -> %s", v.key, v.value);
         }
-        writefln("# Principal Variation (max depth %s):", maxDepth);
-        writefln("%s", principalVariation[0..maxDepth]);
-
-        writefln("# Alpha moves:");
-        foreach(e; alphaMoves.byKeyValue()) {
-            writefln(" %s: score = %s", e.key, e.value);
-        }
 
         writefln("Nodes evaluated ............. %s", nodesEvaluated);
         writefln("Quiescing nodes evaluated ... %s", quiescingNodesEvaluated);
-        writefln("Elapsed time ................ %.2s ms (%s NPS)", elapsedMs, nps);
+        writefln("PV moves .................... %s", pvMoves.length);
+        writefln("Elapsed time ................ %.2f ms (%s NPS)", elapsedMs, nps);
 
         return bestMove;
     }
-
+private:
     int alphaBeta(int depth, int alpha, int beta) {
         //writefln("  alphaBeta depth %s %s, %s", depth, alpha, beta);
         enum doQuiescence = false;
@@ -113,19 +130,22 @@ public:
                 score = -alphaBeta(depth - 1, -beta, -alpha);
             }
 
+            // if(score == 15) {
+            //     writefln("!! 15 %s @ depth %s %s", m, depth, pos.key());
+            // }
+
             pos.unmakeMove();
 
             if(score >= beta) {
                 // beta cutoff
-
-                //writefln("beta cutoff %s", beta);
+                //writefln("beta cutoff %s > %s", score, beta);
                 moveGenerator.discardMoves(numMoves - 1 - i);
                 return beta;
             }
             if(score > alpha) {
                 //writefln("score > alpha (%s > %s)", score, alpha);
                 alpha = score;
-                alphaMoves.update(m, ()=>score, (ref int s) { if(score > s) s = score; });
+                pvMoves[pos.key()] = m;
             }
         }
 
@@ -169,23 +189,22 @@ public:
         }
         return alpha;
     }
-
-private:
     MoveGenerator moveGenerator;
     Evaluator evaluator;
     Position pos;
-    int maxDepth;
     ulong timeMs;
     ulong nodesEvaluated;
     ulong quiescingNodesEvaluated;
 
-    int[Move] alphaMoves;
+    // Alpha cutoff moves found keyed by position hash
+    Move[PosKey] pvMoves;
 
-    Move[] principalVariation;
     LineScore[][Move] lineScores;
 
     static struct LineScore {
         int score;
         int depth;
+        PosKey posKey;
+        string toString() { return "{%s D:%s %x}".format(score, depth, posKey); }
     }
 }

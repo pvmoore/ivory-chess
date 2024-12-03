@@ -17,7 +17,7 @@ public:
         uint[2] material;
         bitboard[2] pieces;
         float endgame;          // 0.0 start position -> 1.0 end game
-        uint hash;
+        PosKey hash;
     }
     struct History {
         uint halfMoveClock;
@@ -25,14 +25,14 @@ public:
         square enPassantTargetSquare;
         Piece capture;
         Move move; 
-        uint hash;
+        PosKey hash;
     }
 
     State state;
     Optimisation opt;
     Stack!(History,MAX_PLY) history;
 
-    override uint key() {
+    override PosKey key() {
         return opt.hash;
     }
     override void makeMove(Move m) {
@@ -63,8 +63,8 @@ public:
 
     // Board update functions
     //──────────────────────────────────────────────────────────────────────────────────────────────────
-    void set(square sq, Piece piece, Side side, bool updateHash) {
-        if(updateHash) {
+    void set(bool updateHash)(square sq, Piece piece, Side side) {
+        static if(updateHash) {
             if(uint b = state.board[sq]) {
                 opt.hash ^= HASH_BOARD[sq*16 + b];
             }
@@ -73,8 +73,8 @@ public:
         state.board.set(sq, piece, side);
         opt.pieces[side.as!uint].set(sq);
     }
-    void setEmpty(square sq, bool updateHash) {
-        if(updateHash) {
+    void setEmpty(bool updateHash)(square sq) {
+        static if(updateHash) {
             if(uint b = state.board[sq]) {
                 opt.hash ^= HASH_BOARD[sq*16 + b];
             }
@@ -83,8 +83,8 @@ public:
         opt.pieces[0].unset(sq);
         opt.pieces[1].unset(sq);
     }
-    void movePiece(square from, square to, bool updateHash) {
-        if(updateHash) {
+    void movePiece(bool updateHash)(square from, square to) {
+        static if(updateHash) {
             uint f = state.board[from];
             uint t = state.board[to];
             assert(f != 0);

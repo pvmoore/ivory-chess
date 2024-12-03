@@ -1,0 +1,428 @@
+<SOS-51 Arena(0): id name SOS 5 for Arena
+<SOS-51 Arena(0): id author Rudolf Huber
+<SOS-51 Arena(0): option name NalimovPath type string default <empty>
+<SOS-51 Arena(0): option name ClearHash type button
+<SOS-51 Arena(0): option name MultiPV type spin default 1 min 1 max 64
+<SOS-51 Arena(0): option name NalimovCache type spin default 1 min 1 max 64
+<SOS-51 Arena(0): option name Hash type spin default 0 min 0 max 1024
+<SOS-51 Arena(0): option name Nullmove type check default true
+<SOS-51 Arena(0): option name Material only type check default false
+<SOS-51 Arena(0): option name Ponder type check default true
+<SOS-51 Arena(0): option name UseNalimov type check default true
+<SOS-51 Arena(0): option name Brute Force type check default false
+<SOS-51 Arena(0): option name OwnBook type check default true
+<SOS-51 Arena(0): uciok
+>SOS-51 Arena(0): setoption name Brute Force value false
+>SOS-51 Arena(0): setoption name Hash value 0
+>SOS-51 Arena(0): setoption name Material only value false
+>SOS-51 Arena(0): setoption name MultiPV value 1
+>SOS-51 Arena(0): setoption name NalimovCache value 1
+>SOS-51 Arena(0): setoption name NalimovPath value <empty>
+>SOS-51 Arena(0): setoption name Nullmove value true
+>SOS-51 Arena(0): setoption name OwnBook value true
+>SOS-51 Arena(0): setoption name UseNalimov value true
+>SOS-51 Arena(0): isready
+<SOS-51 Arena(0): readyok
+>SOS-51 Arena(0): ucinewgame
+>SOS-51 Arena(0): setoption name Ponder value false
+>SOS-51 Arena(0): position startpos
+>SOS-51 Arena(0): position startpos moves d2d4
+>SOS-51 Arena(0): isready
+<SOS-51 Arena(0): readyok
+>SOS-51 Arena(0): go wtime 300000 btime 300000 movestogo 40
+<SOS-51 Arena(0): info cpuload 0
+<SOS-51 Arena(0): bestmove g8f6
+>SOS-51 Arena(0): position startpos moves d2d4 g8f6 g1f3
+>SOS-51 Arena(0): isready
+<SOS-51 Arena(0): readyok
+>SOS-51 Arena(0): go wtime 294725 btime 299991 movestogo 39
+<SOS-51 Arena(0): info cpuload 0
+<SOS-51 Arena(0): bestmove g7g6
+>SOS-51 Arena(0): position startpos moves d2d4 g8f6 g1f3 g7g6 b1c3
+>SOS-51 Arena(0): isready
+<SOS-51 Arena(0): readyok
+>SOS-51 Arena(0): go wtime 290217 btime 299984 movestogo 38
+<SOS-51 Arena(0): info cpuload 0
+<SOS-51 Arena(0): bestmove f8g7
+>SOS-51 Arena(0): position startpos moves d2d4 g8f6 g1f3 g7g6 b1c3 f8g7 c1g5
+>SOS-51 Arena(0): isready
+<SOS-51 Arena(0): readyok
+>SOS-51 Arena(0): go wtime 285232 btime 299969 movestogo 37
+<SOS-51 Arena(0): info depth 1 seldepth 0
+<SOS-51 Arena(0): info score cp -48  depth 1 seldepth 4 nodes 6 time 0 pv h7h6  
+<SOS-51 Arena(0): info score cp -46  depth 1 seldepth 4 nodes 11 time 0 pv e8g8  
+<SOS-51 Arena(0): info depth 1 seldepth 4
+<SOS-51 Arena(0): info depth 2 seldepth 4
+<SOS-51 Arena(0): info score cp -46  depth 2 seldepth 7 nodes 137 time 0 pv h7h6  
+<SOS-51 Arena(0): info depth 2 seldepth 7
+<SOS-51 Arena(0): info depth 3 seldepth 7
+<SOS-51 Arena(0): info score cp -40  depth 3 seldepth 7 nodes 243 time 0 pv h7h6  g5h4  e8g8  
+<SOS-51 Arena(0): info depth 3 seldepth 9
+<SOS-51 Arena(0): info depth 4 seldepth 9
+<SOS-51 Arena(0): info score cp -45  depth 4 seldepth 13 nodes 2915 time 0 pv h7h6  g5f4  e8g8  e2e4  
+<SOS-51 Arena(0): info depth 4 seldepth 13
+<SOS-51 Arena(0): info depth 5 seldepth 13
+<SOS-51 Arena(0): info score cp -36  depth 5 seldepth 13 nodes 3530 time 0 pv h7h6  g5f4  e8g8  e2e4  d7d5  
+<SOS-51 Arena(0): info depth 5 seldepth 13
+<SOS-51 Arena(0): info depth 6 seldepth 13
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 1
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 2
+<SOS-51 Arena(0): info currmove e8g8 currmovenumber 3
+<SOS-51 Arena(0): info currmove h8g8 currmovenumber 4
+<SOS-51 Arena(0): info currmove c7c6 currmovenumber 5
+<SOS-51 Arena(0): info currmove e7e5 currmovenumber 6
+<SOS-51 Arena(0): info currmove h8f8 currmovenumber 7
+<SOS-51 Arena(0): info currmove b8a6 currmovenumber 8
+<SOS-51 Arena(0): info currmove b8c6 currmovenumber 9
+<SOS-51 Arena(0): info currmove f6e4 currmovenumber 10
+<SOS-51 Arena(0): info currmove f6g8 currmovenumber 11
+<SOS-51 Arena(0): info currmove f6g4 currmovenumber 12
+<SOS-51 Arena(0): info currmove f6d5 currmovenumber 13
+<SOS-51 Arena(0): info currmove f6h5 currmovenumber 14
+<SOS-51 Arena(0): info currmove a7a5 currmovenumber 15
+<SOS-51 Arena(0): info currmove a7a6 currmovenumber 16
+<SOS-51 Arena(0): info currmove b7b5 currmovenumber 17
+<SOS-51 Arena(0): info currmove b7b6 currmovenumber 18
+<SOS-51 Arena(0): info currmove c7c5 currmovenumber 19
+<SOS-51 Arena(0): info currmove g7h6 currmovenumber 20
+<SOS-51 Arena(0): info currmove e8f8 currmovenumber 21
+<SOS-51 Arena(0): info currmove d7d6 currmovenumber 22
+<SOS-51 Arena(0): info currmove g7f8 currmovenumber 23
+<SOS-51 Arena(0): info currmove e7e6 currmovenumber 24
+<SOS-51 Arena(0): info currmove h7h5 currmovenumber 25
+<SOS-51 Arena(0): info score cp -33
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 1
+<SOS-51 Arena(0): info score cp -34
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 1
+<SOS-51 Arena(0): info score cp -35
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 1
+<SOS-51 Arena(0): info score cp -36
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 1
+<SOS-51 Arena(0): info score cp -37
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 1
+<SOS-51 Arena(0): info score cp -36  depth 6 seldepth 15 nodes 14862 time 0 pv d7d5  e2e3  e8g8  f3e5  h7h6  g5h4  
+<SOS-51 Arena(0): info score cp -36
+<SOS-51 Arena(0): info depth 6 seldepth 15
+<SOS-51 Arena(0): info depth 7 seldepth 15
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -36  depth 7 seldepth 19 nodes 21511 time 15 pv d7d5  e2e3  e8g8  f3e5  h7h6  g5h4  b8c6  
+<SOS-51 Arena(0): info score cp -36
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -35
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -34
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -33
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -32
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -31
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -30
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -29
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -28
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -27
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -26
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 2
+<SOS-51 Arena(0): info currmove e8g8 currmovenumber 3
+<SOS-51 Arena(0): info currmove c7c6 currmovenumber 4
+<SOS-51 Arena(0): info currmove b8c6 currmovenumber 5
+<SOS-51 Arena(0): info currmove e7e5 currmovenumber 6
+<SOS-51 Arena(0): info currmove e8f8 currmovenumber 7
+<SOS-51 Arena(0): info currmove f6h5 currmovenumber 8
+<SOS-51 Arena(0): info currmove h8g8 currmovenumber 9
+<SOS-51 Arena(0): info currmove f6e4 currmovenumber 10
+<SOS-51 Arena(0): info currmove b8a6 currmovenumber 11
+<SOS-51 Arena(0): info currmove f6g4 currmovenumber 12
+<SOS-51 Arena(0): info currmove c7c5 currmovenumber 13
+<SOS-51 Arena(0): info currmove f6d5 currmovenumber 14
+<SOS-51 Arena(0): info currmove a7a5 currmovenumber 15
+<SOS-51 Arena(0): info currmove a7a6 currmovenumber 16
+<SOS-51 Arena(0): info currmove b7b5 currmovenumber 17
+<SOS-51 Arena(0): info currmove b7b6 currmovenumber 18
+<SOS-51 Arena(0): info currmove g7h6 currmovenumber 19
+<SOS-51 Arena(0): info currmove f6g8 currmovenumber 20
+<SOS-51 Arena(0): info currmove h8f8 currmovenumber 21
+<SOS-51 Arena(0): info currmove d7d6 currmovenumber 22
+<SOS-51 Arena(0): info currmove g7f8 currmovenumber 23
+<SOS-51 Arena(0): info currmove e7e6 currmovenumber 24
+<SOS-51 Arena(0): info currmove h7h5 currmovenumber 25
+<SOS-51 Arena(0): info score cp -27
+<SOS-51 Arena(0): info depth 7 seldepth 19
+<SOS-51 Arena(0): info depth 8 seldepth 19
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -26  depth 8 seldepth 19 nodes 67119 time 31 pv d7d5  e2e3  e8g8  f3e5  h7h6  g5f4  g6g5  
+<SOS-51 Arena(0): info score cp -26
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -25
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -24
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -23
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -22
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -21
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -20
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -19
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -18
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 2
+<SOS-51 Arena(0): info currmove e8g8 currmovenumber 3
+<SOS-51 Arena(0): info currmove c7c6 currmovenumber 4
+<SOS-51 Arena(0): info currmove b8c6 currmovenumber 5
+<SOS-51 Arena(0): info currmove e7e5 currmovenumber 6
+<SOS-51 Arena(0): info currmove e8f8 currmovenumber 7
+<SOS-51 Arena(0): info currmove f6e4 currmovenumber 8
+<SOS-51 Arena(0): info currmove b8a6 currmovenumber 9
+<SOS-51 Arena(0): info currmove f6h5 currmovenumber 10
+<SOS-51 Arena(0): info currmove g7h6 currmovenumber 11
+<SOS-51 Arena(0): info currmove d7d6 currmovenumber 12
+<SOS-51 Arena(0): info currmove h8g8 currmovenumber 13
+<SOS-51 Arena(0): info currmove f6g4 currmovenumber 14
+<SOS-51 Arena(0): info currmove f6d5 currmovenumber 15
+<SOS-51 Arena(0): info currmove c7c5 currmovenumber 16
+<SOS-51 Arena(0): info currmove a7a5 currmovenumber 17
+<SOS-51 Arena(0): info currmove b7b6 currmovenumber 18
+<SOS-51 Arena(0): info currmove b7b5 currmovenumber 19
+<SOS-51 Arena(0): info currmove f6g8 currmovenumber 20
+<SOS-51 Arena(0): info currmove h8f8 currmovenumber 21
+<SOS-51 Arena(0): info currmove a7a6 currmovenumber 22
+<SOS-51 Arena(0): info currmove g7f8 currmovenumber 23
+<SOS-51 Arena(0): info currmove e7e6 currmovenumber 24
+<SOS-51 Arena(0): info currmove h7h5 currmovenumber 25
+<SOS-51 Arena(0): info score cp -19
+<SOS-51 Arena(0): info depth 8 seldepth 21
+<SOS-51 Arena(0): info depth 9 seldepth 21
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info nodes 151091 nps 2398269 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info score cp -18  depth 9 seldepth 24 nodes 190948 time 94 pv d7d5  e2e3  e8g8  f1e2  h7h6  g5f4  f6e4  d1d3  e4c3  
+<SOS-51 Arena(0): info score cp -18
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -17
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 2
+<SOS-51 Arena(0): info currmove e8g8 currmovenumber 3
+<SOS-51 Arena(0): info currmove c7c6 currmovenumber 4
+<SOS-51 Arena(0): info currmove b8c6 currmovenumber 5
+<SOS-51 Arena(0): info currmove f6e4 currmovenumber 6
+<SOS-51 Arena(0): info currmove e7e5 currmovenumber 7
+<SOS-51 Arena(0): info currmove e8f8 currmovenumber 8
+<SOS-51 Arena(0): info currmove b8a6 currmovenumber 9
+<SOS-51 Arena(0): info currmove f6h5 currmovenumber 10
+<SOS-51 Arena(0): info currmove g7h6 currmovenumber 11
+<SOS-51 Arena(0): info currmove d7d6 currmovenumber 12
+<SOS-51 Arena(0): info currmove f6d5 currmovenumber 13
+<SOS-51 Arena(0): info currmove h8g8 currmovenumber 14
+<SOS-51 Arena(0): info currmove f6g4 currmovenumber 15
+<SOS-51 Arena(0): info currmove c7c5 currmovenumber 16
+<SOS-51 Arena(0): info currmove a7a6 currmovenumber 17
+<SOS-51 Arena(0): info currmove h8f8 currmovenumber 18
+<SOS-51 Arena(0): info currmove b7b6 currmovenumber 19
+<SOS-51 Arena(0): info currmove a7a5 currmovenumber 20
+<SOS-51 Arena(0): info currmove b7b5 currmovenumber 21
+<SOS-51 Arena(0): info currmove f6g8 currmovenumber 22
+<SOS-51 Arena(0): info currmove g7f8 currmovenumber 23
+<SOS-51 Arena(0): info currmove e7e6 currmovenumber 24
+<SOS-51 Arena(0): info currmove h7h5 currmovenumber 25
+<SOS-51 Arena(0): info score cp -18
+<SOS-51 Arena(0): info depth 9 seldepth 24
+<SOS-51 Arena(0): info depth 10 seldepth 24
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -17  depth 10 seldepth 24 nodes 444140 time 203 pv d7d5  e2e3  e8g8  f1e2  h7h6  g5f4  g6g5  
+<SOS-51 Arena(0): info score cp -17
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -16
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info score cp -15
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info nodes 601255 nps 2260357 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info score cp -14
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 2
+<SOS-51 Arena(0): info currmove e8g8 currmovenumber 3
+<SOS-51 Arena(0): info currmove c7c6 currmovenumber 4
+<SOS-51 Arena(0): info currmove b8c6 currmovenumber 5
+<SOS-51 Arena(0): info currmove b8a6 currmovenumber 6
+<SOS-51 Arena(0): info currmove f6g4 currmovenumber 7
+<SOS-51 Arena(0): info currmove f6e4 currmovenumber 8
+<SOS-51 Arena(0): info currmove e7e5 currmovenumber 9
+<SOS-51 Arena(0): info currmove e8f8 currmovenumber 10
+<SOS-51 Arena(0): info currmove f6h5 currmovenumber 11
+<SOS-51 Arena(0): info currmove a7a6 currmovenumber 12
+<SOS-51 Arena(0): info currmove h8g8 currmovenumber 13
+<SOS-51 Arena(0): info currmove d7d6 currmovenumber 14
+<SOS-51 Arena(0): info currmove a7a5 currmovenumber 15
+<SOS-51 Arena(0): info currmove c7c5 currmovenumber 16
+<SOS-51 Arena(0): info currmove g7h6 currmovenumber 17
+<SOS-51 Arena(0): info currmove f6d5 currmovenumber 18
+<SOS-51 Arena(0): info currmove e7e6 currmovenumber 19
+<SOS-51 Arena(0): info currmove h8f8 currmovenumber 20
+<SOS-51 Arena(0): info currmove b7b5 currmovenumber 21
+<SOS-51 Arena(0): info currmove f6g8 currmovenumber 22
+<SOS-51 Arena(0): info currmove b7b6 currmovenumber 23
+<SOS-51 Arena(0): info currmove g7f8 currmovenumber 24
+<SOS-51 Arena(0): info currmove h7h5 currmovenumber 25
+<SOS-51 Arena(0): info score cp -15
+<SOS-51 Arena(0): info depth 10 seldepth 26
+<SOS-51 Arena(0): info depth 11 seldepth 26
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info nodes 851347 nps 2177358 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 951367 nps 2249094 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 1001375 nps 2205671 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 1101383 nps 2198369 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info score cp -14  depth 11 seldepth 26 nodes 1132204 time 500 pv d7d5  e2e3  e8g8  f1e2  h7h6  g5f4  g6g5  
+<SOS-51 Arena(0): info score cp -14
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info nodes 1151387 nps 2231370 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 2
+<SOS-51 Arena(0): info currmove e8g8 currmovenumber 3
+<SOS-51 Arena(0): info currmove c7c6 currmovenumber 4
+<SOS-51 Arena(0): info nodes 1451487 nps 2209264 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove b8c6 currmovenumber 5
+<SOS-51 Arena(0): info nodes 1501511 nps 2231071 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove b8a6 currmovenumber 6
+<SOS-51 Arena(0): info currmove f6g4 currmovenumber 7
+<SOS-51 Arena(0): info currmove f6e4 currmovenumber 8
+<SOS-51 Arena(0): info currmove e7e5 currmovenumber 9
+<SOS-51 Arena(0): info currmove e8f8 currmovenumber 10
+<SOS-51 Arena(0): info currmove c7c5 currmovenumber 11
+<SOS-51 Arena(0): info currmove f6h5 currmovenumber 12
+<SOS-51 Arena(0): info currmove a7a6 currmovenumber 13
+<SOS-51 Arena(0): info currmove e7e6 currmovenumber 14
+<SOS-51 Arena(0): info currmove h8g8 currmovenumber 15
+<SOS-51 Arena(0): info currmove d7d6 currmovenumber 16
+<SOS-51 Arena(0): info currmove a7a5 currmovenumber 17
+<SOS-51 Arena(0): info currmove f6d5 currmovenumber 18
+<SOS-51 Arena(0): info currmove g7h6 currmovenumber 19
+<SOS-51 Arena(0): info currmove h8f8 currmovenumber 20
+<SOS-51 Arena(0): info currmove b7b5 currmovenumber 21
+<SOS-51 Arena(0): info currmove f6g8 currmovenumber 22
+<SOS-51 Arena(0): info currmove g7f8 currmovenumber 23
+<SOS-51 Arena(0): info currmove b7b6 currmovenumber 24
+<SOS-51 Arena(0): info currmove h7h5 currmovenumber 25
+<SOS-51 Arena(0): info score cp -15
+<SOS-51 Arena(0): info depth 11 seldepth 26
+<SOS-51 Arena(0): info depth 12 seldepth 26
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 2
+<SOS-51 Arena(0): info currmove e8g8 currmovenumber 3
+<SOS-51 Arena(0): info currmove c7c6 currmovenumber 4
+<SOS-51 Arena(0): info nodes 2151835 nps 2184604 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 2201863 nps 2199663 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 2251875 nps 2182049 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove b8c6 currmovenumber 5
+<SOS-51 Arena(0): info currmove f6e4 currmovenumber 6
+<SOS-51 Arena(0): info currmove e7e5 currmovenumber 7
+<SOS-51 Arena(0): info currmove b8a6 currmovenumber 8
+<SOS-51 Arena(0): info currmove f6g4 currmovenumber 9
+<SOS-51 Arena(0): info currmove d7d6 currmovenumber 10
+<SOS-51 Arena(0): info currmove e8f8 currmovenumber 11
+<SOS-51 Arena(0): info nodes 2351903 nps 2212514 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove a7a6 currmovenumber 12
+<SOS-51 Arena(0): info currmove h8g8 currmovenumber 13
+<SOS-51 Arena(0): info currmove c7c5 currmovenumber 14
+<SOS-51 Arena(0): info currmove f6h5 currmovenumber 15
+<SOS-51 Arena(0): info currmove e7e6 currmovenumber 16
+<SOS-51 Arena(0): info currmove f6d5 currmovenumber 17
+<SOS-51 Arena(0): info currmove g7h6 currmovenumber 18
+<SOS-51 Arena(0): info currmove a7a5 currmovenumber 19
+<SOS-51 Arena(0): info currmove b7b5 currmovenumber 20
+<SOS-51 Arena(0): info currmove h8f8 currmovenumber 21
+<SOS-51 Arena(0): info currmove b7b6 currmovenumber 22
+<SOS-51 Arena(0): info currmove g7f8 currmovenumber 23
+<SOS-51 Arena(0): info currmove f6g8 currmovenumber 24
+<SOS-51 Arena(0): info currmove h7h5 currmovenumber 25
+<SOS-51 Arena(0): info score cp -16
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info nodes 2702159 nps 2187982 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 2752167 nps 2199973 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info score cp -17
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info nodes 3102575 nps 2205099 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 3202599 nps 2202612 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 3252607 nps 2212657 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info score cp -16  depth 12 seldepth 29 nodes 3763134 time 1672 pv d7d5  e2e3  e8g8  f1e2  h7h6  g5f4  g6g5  
+<SOS-51 Arena(0): info score cp -16
+<SOS-51 Arena(0): info depth 12 seldepth 29
+<SOS-51 Arena(0): info depth 13 seldepth 29
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info nodes 3853027 nps 2261166 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 3953035 nps 2257587 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 4153099 nps 2251002 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 4203103 nps 2259732 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 4353143 nps 2263724 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 4453155 nps 2278994 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 4503259 nps 2285918 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 4903383 nps 2306388 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 5003399 nps 2302530 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info score cp -16  depth 13 seldepth 30 nodes 5292608 time 2312 pv d7d5  e2e3  e8g8  f1e2  h7h6  g5f4  g6g5  
+<SOS-51 Arena(0): info score cp -16
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info nodes 5503603 nps 2301799 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 5803687 nps 2306711 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 6103719 nps 2338589 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 6153739 nps 2330079 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 6203767 nps 2334876 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 6403815 nps 2341431 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 6753923 nps 2336189 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info score cp -15
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info nodes 7004039 nps 2322294 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 7154071 nps 2323504 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 7554443 nps 2335221 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 7754579 nps 2351297 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 7954659 nps 2367458 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 8004727 nps 2360580 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 8605059 nps 2363377 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 8905135 nps 2354609 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info score cp -14
+<SOS-51 Arena(0): info currmove d7d5 currmovenumber 1
+<SOS-51 Arena(0): info nodes 9355375 nps 2338259 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove h7h6 currmovenumber 2
+<SOS-51 Arena(0): info nodes 9855567 nps 2335442 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove e8g8 currmovenumber 3
+<SOS-51 Arena(0): info nodes 10005607 nps 2336666 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove c7c6 currmovenumber 4
+<SOS-51 Arena(0): info nodes 10455835 nps 2339112 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 10655911 nps 2342988 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove b8c6 currmovenumber 5
+<SOS-51 Arena(0): info nodes 11156079 nps 2340763 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 11356215 nps 2336669 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 11556247 nps 2332710 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 11606267 nps 2335264 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 11706303 nps 2333792 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info nodes 11906399 nps 2330019 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove f6e4 currmovenumber 6
+<SOS-51 Arena(0): info currmove f6g4 currmovenumber 7
+<SOS-51 Arena(0): info currmove e7e5 currmovenumber 8
+<SOS-51 Arena(0): info currmove b8a6 currmovenumber 9
+<SOS-51 Arena(0): info currmove f6h5 currmovenumber 10
+<SOS-51 Arena(0): info currmove e8f8 currmovenumber 11
+<SOS-51 Arena(0): info currmove e7e6 currmovenumber 12
+<SOS-51 Arena(0): info nodes 12006419 nps 2328178 hashfull 1000 tbhits 0
+<SOS-51 Arena(0): info currmove a7a6 currmovenumber 13
+<SOS-51 Arena(0): info currmove d7d6 currmovenumber 14
+<SOS-51 Arena(0): info currmove c7c5 currmovenumber 15
+<SOS-51 Arena(0): info currmove h8g8 currmovenumber 16
+<SOS-51 Arena(0): info currmove g7h6 currmovenumber 17
+<SOS-51 Arena(0): info currmove b7b5 currmovenumber 18
+<SOS-51 Arena(0): info currmove f6d5 currmovenumber 19
+<SOS-51 Arena(0): info currmove h8f8 currmovenumber 20
+<SOS-51 Arena(0): info currmove a7a5 currmovenumber 21
+<SOS-51 Arena(0): info currmove b7b6 currmovenumber 22
+<SOS-51 Arena(0): info currmove f6g8 currmovenumber 23
+<SOS-51 Arena(0): info currmove h7h5 currmovenumber 24
+<SOS-51 Arena(0): info currmove g7f8 currmovenumber 25
+<SOS-51 Arena(0): info score cp -15
+<SOS-51 Arena(0): info depth 13 seldepth 37
+<SOS-51 Arena(0): info cpuload 996
+<SOS-51 Arena(0): bestmove d7d5 ponder e2e3

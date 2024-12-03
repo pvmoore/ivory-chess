@@ -7,7 +7,7 @@ import core.atomic            : cas;
 
 import std.stdio              : writefln, writef;
 import std.format             : format;
-import std.algorithm          : any, find, map, filter, sort, sum;
+import std.algorithm          : any, find, map, filter, sort, sum, reverse;
 import std.math               : abs, isClose;
 import std.range              : array, iota;
 import std.datetime.stopwatch : StopWatch, AutoStart;
@@ -39,10 +39,15 @@ enum MAX_MOVES            = 1024;
 enum MAX_PLY              = 128;
 enum MAX_QUIESCENCE_DEPTH = 64;
 
+// Initialise global static data:
+//  - Random number generator
 __gshared {
     Mt19937 rng;
+    enum FIXED_SEED = true;
 
     static this() {
-        rng = Mt19937(unpredictableSeed());
+        static if(true)
+        uint seed = FIXED_SEED ? 71 : unpredictableSeed();
+        rng = Mt19937(seed);
     }
 }
