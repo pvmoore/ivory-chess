@@ -9,7 +9,7 @@ import std.stdio              : writefln, writef;
 import std.format             : format;
 import std.algorithm          : any, find, map, filter, sort, sum, reverse;
 import std.math               : abs, isClose;
-import std.range              : array, iota;
+import std.range              : array, iota, join;
 import std.datetime.stopwatch : StopWatch, AutoStart;
 import std.random             : Mt19937, uniform, unpredictableSeed;
 

@@ -15,6 +15,9 @@ import ivory.all;
     Max depth = 8:
         Nodes evaluated ............. 4,203,024
         PV moves .................... 21,271
+    Max depth = 9:
+        Nodes evaluated ............. 140,854,679
+        PV moves .................... 696,821
 
  */
 
@@ -92,15 +95,22 @@ public:
         double elapsedSec = elapsedMs / 1000.0;
         ulong nps = (nodesEvaluated / elapsedSec).as!ulong;
 
-        writefln("# Move Scores:");
-        foreach(v; lineScores.byKeyValue()) {
-            writefln("%s -> %s", v.key, v.value);
-        }
+        // writefln("# Move Scores:");
+        // foreach(v; lineScores.byKeyValue()) {
+        //     writefln("%s -> %s", v.key, v.value);
+        // }
+
+        Move[] pvLine = getPVLine(maxDepth);
+        writefln("# PV line: %s", pvLine);
 
         writefln("Nodes evaluated ............. %s", nodesEvaluated);
         writefln("Quiescing nodes evaluated ... %s", quiescingNodesEvaluated);
         writefln("PV moves .................... %s", pvMoves.length);
         writefln("Elapsed time ................ %.2f ms (%s NPS)", elapsedMs, nps);
+        
+        // Send pv and best move to the UCI GUI
+        uciWriteLine("info pv %s", pvLine.map!(it=>it.toString()).join(", "));
+        uciWriteLine("bestmove %s", bestMove);
 
         return bestMove;
     }
@@ -206,5 +216,22 @@ private:
         int depth;
         PosKey posKey;
         string toString() { return "{%s D:%s %x}".format(score, depth, posKey); }
+    }
+    Move[] getPVLine(int depth) {
+
+        Move[] moves;
+
+        while(moves.length < depth) {
+            Move m = pvMoves.get(pos.key(), NO_MOVE);
+            if(m == NO_MOVE) break;
+
+            moves ~= m;
+            pos.makeMove(m);
+        }
+
+        foreach(i; 0..moves.length) {
+            pos.unmakeMove();
+        }
+        return moves;
     }
 }
