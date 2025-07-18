@@ -13,7 +13,8 @@ import std.range              : array, iota, join;
 import std.datetime.stopwatch : StopWatch, AutoStart;
 import std.random             : Mt19937, uniform, unpredictableSeed;
 
-import common                 : as, flushConsole, frontOrElse, Ansi, ansiWrap, throwIf, throwIfNot, todo;
+import common.utils : as, todo, frontOrElse, throwIf, throwIfNot;
+import common.io    : Ansi, ansiWrap, flushConsole;
 
 import ivory.FEN;
 import ivory.Game;
